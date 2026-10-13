@@ -3,7 +3,7 @@ import { customElement, query, state } from "lit/decorators.js";
 import { dataService } from "./services/data.service";
 import { TRENDING_DOWN, TRENDING_UP } from "./assets/icons/icons";
 import { configureTheme, defineComponents, IgcAvatarComponent, IgcIconComponent, IgcInputComponent, IgcLinearProgressComponent, registerIconFromText } from "igniteui-webcomponents";
-import { FilteringLogic, IgcCellTemplateContext, IgcFilteringExpressionsTree, IgcGridComponent, IgcStringFilteringOperand } from "igniteui-webcomponents-grids/grids";
+import { FilteringLogic, IgcCellTemplateContext, IgcColumnPipeArgs, IgcFilteringExpressionsTree, IgcGridComponent, IgcStringFilteringOperand } from "igniteui-webcomponents-grids/grids";
 import "igniteui-webcomponents-grids/grids/combined.js";
 import financeStyles from "./finance-grid.scss?inline";
 
@@ -36,6 +36,10 @@ export default class FinanceGrid extends LitElement {
 
   // @state()
   // private isLoading = true;
+
+  private currencyDigitsFormat: IgcColumnPipeArgs = {
+    digitsInfo: '1.2-2'
+  };
 
   private profitConditionHandler = (rowData: any, columnKey: string) => {
     return rowData[columnKey] >= 0;
@@ -133,7 +137,7 @@ export default class FinanceGrid extends LitElement {
 
     return html`
       <link rel="stylesheet" href="${import.meta.env.BASE_URL}themes/bootstrap.css" />
-      <igc-grid .data="${this.financeData}" .isLoading="${!this.financeData.length}" primary-key="id" row-selection="multiple" class="grid-sizing">
+      <igc-grid .data="${this.financeData}" .isLoading="${!this.financeData.length}" primary-key="id" class="grid-sizing">
         <igc-grid-toolbar>
           <igc-grid-toolbar-title>Financial Portfolio</igc-grid-toolbar-title>
           <igc-input type="search" placeholder="Filter by Asset" @igcInput="${this.filter}"></igc-input>
@@ -143,17 +147,17 @@ export default class FinanceGrid extends LitElement {
             <igc-grid-toolbar-exporter></igc-grid-toolbar-exporter>
           </igc-grid-toolbar-actions>
         </igc-grid-toolbar>
-        <igc-column field="id" header="Symbol" ?sortable="${true}" width="7%"></igc-column>
-        <igc-column field="holdingName" header="Asset" ?sortable="${true}" width="15%" .bodyTemplate="${this.assetTemplate}"></igc-column>
-        <igc-column field="positions" header="Position" ?sortable="${true}" data-type="number" width="6%"></igc-column>
-        <igc-column field="value.boughtPrice" header="Average Cost/Share" data-type="currency" ?sortable="${true}" width="10%"></igc-column>
-        <igc-column field="value.currentPrice" header="Last Price" data-type="currency" ?sortable="${true}" width="7%"></igc-column>
-        <igc-column field="dailyPercentageChange" header="Daily Change %" .cellClasses="${this.profitLossValueClasses}" data-type="percent" .bodyTemplate=${this.dailyChangePercentageTemplate} ?sortable="${true}" width="10%"> </igc-column>
-        <igc-column field="marketValue" header="Market Value" data-type="currency" ?sortable="${true}" width="5%"></igc-column>
-        <igc-column field="profitLossValue" header="NET Profit/Loss" .bodyTemplate="${this.profitLossValueTemplate}" ?sortable="${true}" data-type="currency" width="10%" .cellClasses="${this.profitLossValueClasses}"></igc-column>
-        <igc-column field="profitLossPercentage" header="NET Profit/Loss %" ?sortable="${true}" data-type="percent" width="10%" .cellClasses="${this.profitLossValueClasses}" .bodyTemplate=${this.dailyChangePercentageTemplate}></igc-column>
-        <igc-column field="allocation" header="Allocation" ?sortable="${true}" data-type="percent" width="10%" .bodyTemplate="${this.allocationTemplate}"></igc-column>
-        <igc-column field="holdingPeriod" header="Holding Period" ?sortable="${true}" width="8%" .bodyTemplate="${this.holdingPeriodTemplate}"></igc-column>
+        <igc-column field="id" header="Symbol" ?sortable="${true}" width="7%" minWidth="68px"></igc-column>
+        <igc-column field="holdingName" header="Asset" ?sortable="${true}" width="15%" minWidth="100px" .bodyTemplate="${this.assetTemplate}"></igc-column>
+        <igc-column field="positions" header="Position" ?sortable="${true}" data-type="number" width="6%" minWidth="68px"></igc-column>
+        <igc-column field="value.boughtPrice" header="Average Cost/Share" data-type="currency" ?sortable="${true}" width="10%" minWidth="80px" .pipeArgs="${this.currencyDigitsFormat}"></igc-column>
+        <igc-column field="value.currentPrice" header="Last Price" data-type="currency" ?sortable="${true}" width="7%" minWidth="80px" .pipeArgs="${this.currencyDigitsFormat}"></igc-column>
+        <igc-column field="dailyPercentageChange" header="Daily Change %" .cellClasses="${this.profitLossValueClasses}" data-type="percent" .bodyTemplate=${this.dailyChangePercentageTemplate} ?sortable="${true}" width="7%" minWidth="110px"> </igc-column>
+        <igc-column field="marketValue" header="Market Value" data-type="currency" ?sortable="${true}" width="8%" minWidth="110px" .pipeArgs="${this.currencyDigitsFormat}"></igc-column>
+        <igc-column field="profitLossValue" header="NET Profit/Loss" .bodyTemplate="${this.profitLossValueTemplate}" ?sortable="${true}" data-type="currency" width="10%" .cellClasses="${this.profitLossValueClasses}" minWidth="90px" .pipeArgs="${this.currencyDigitsFormat}"></igc-column>
+        <igc-column field="profitLossPercentage" header="NET Profit/Loss %" ?sortable="${true}" data-type="percent" width="10%" .cellClasses="${this.profitLossValueClasses}" .bodyTemplate=${this.dailyChangePercentageTemplate} minWidth="98px"></igc-column>
+        <igc-column field="allocation" header="Allocation" ?sortable="${true}" data-type="percent" width="10%" .bodyTemplate="${this.allocationTemplate}" minWidth="80px"></igc-column>
+        <igc-column field="holdingPeriod" header="Holding Period" ?sortable="${true}" .bodyTemplate="${this.holdingPeriodTemplate}" minWidth="50px"></igc-column>
       </igc-grid>
     `;
   }
