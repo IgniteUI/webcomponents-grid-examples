@@ -1,5 +1,10 @@
 import { Route } from "@vaadin/router";
 
+/** Route action that imports a sample on its first visit, so the shell bundle that every page loads does not carry it. */
+const load = (importSample: () => Promise<unknown>) => async () => {
+  await importSample();
+};
+
 export const routes: Route[] = [
   { path: "", redirect: "home" },
   {
@@ -12,6 +17,12 @@ export const routes: Route[] = [
       { path: "hr-portal", component: "hr-portal-view" },
       { path: "sales", component: "sales-view" },
       { path: "fleet", component: "fleet-management-view" },
+      { path: "finance-grid-new", component: "finance-grid-new-view" },
+      { path: "grid-fintech-100k", component: "grid-fintech-100k-view" },
+      { path: "sales-dashboard", component: "sales-dashboard-view" },
+      { path: "fleet-management-new", component: "fleet-management-new-view" },
+      { path: "grid-fintech-dock-manager", component: "grid-fintech-dock-manager-view" },
+      { path: "excel", component: "excel-view" },
       {
         path: "charts",
         children: [
@@ -30,6 +41,36 @@ export const routes: Route[] = [
   { path: "hr-portal", component: "app-hr-portal" },
   { path: "sales", component: "app-sales-grid" },
   { path: "fleet", component: "app-fleet-management" },
+  {
+    path: "finance-grid-new",
+    component: "app-finance-grid-new",
+    action: load(() => import("../projects/finance-grid-new/src/finance-grid-new")),
+  },
+  {
+    path: "grid-fintech-100k",
+    component: "app-grid-fintech-100k",
+    action: load(() => import("../projects/grid-fintech-100k/src/grid-fintech-100k")),
+  },
+  {
+    path: "sales-dashboard",
+    component: "app-sales-dashboard",
+    action: load(() => import("../projects/sales-dashboard/src/sales-dashboard")),
+  },
+  {
+    path: "fleet-management-new",
+    component: "app-fleet-management-new",
+    action: load(() => import("../projects/fleet-management-new/src/fleet-management-new")),
+  },
+  {
+    path: "grid-fintech-dock-manager",
+    component: "app-grid-fintech-dock-manager",
+    action: load(() => import("../projects/grid-fintech-dock-manager/src/grid-fintech-dock-manager")),
+  },
+  {
+    path: "excel",
+    component: "app-excel",
+    action: load(() => import("../projects/excel/src/excel")),
+  },
   {
     path: "charts",
     children: [

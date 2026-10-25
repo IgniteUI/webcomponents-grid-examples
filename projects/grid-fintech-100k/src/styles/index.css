@@ -1,0 +1,23 @@
+/* The theme also brings the Material Icons font, which the grid's own toolbar and header icons use. */
+@import "igniteui-webcomponents-grids/grids/themes/light/fluent.css";
+
+html,
+body {
+  height: 100%;
+  background: #f3f5f7;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}

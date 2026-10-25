@@ -1,0 +1,212 @@
+// Watchlist pane. Grid colours come from the desk's grid tokens; this file
+// covers layout only, on top of the shared pane primitives.
+
+@use "../styles/desk-shared" as desk;
+@use "../styles/desk-tokens" as tokens;
+
+@include desk.pane;
+@include desk.quote-primitives;
+@include desk.scrollbars;
+@include desk.lists;
+@include desk.input-ellipsis;
+@include tokens.grid-embedded-tokens();
+
+.wl-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--ig-gray-200);
+  flex-shrink: 0;
+
+  > * {
+    flex: 1;
+  }
+}
+
+// The filter and the picker split the row evenly.
+.wl-search,
+.wl-add {
+  --ig-size: var(--ig-size-small);
+
+  flex: 1 1 0;
+  min-width: 0;
+  font-size: 12px;
+}
+
+.watchlist-grid-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--ig-gray-400);
+}
+
+.watchlist-grid {
+  @include desk.desk-grid;
+}
+
+// The toolbar's actions sit tight, as a row of borderless buttons.
+.igx-grid-toolbar__actions {
+  @include tokens.grid-toolbar-action-tokens();
+
+  padding: 0.2rem;
+  gap: 0.2rem;
+
+  .igx-button {
+    min-width: 0;
+  }
+}
+
+.range-cell {
+  display: grid;
+  grid-template-columns: 8ch 1fr 8ch;
+  align-items: center;
+  gap: 8px;
+
+  .range-value {
+    text-align: right;
+    display: inline-block;
+
+    &:first-of-type {
+      margin-inline-end: 8px;
+    }
+  }
+}
+
+// The rail the marker travels along. Neutral, so the only colour in the cell is
+// the marker's. Opaque on purpose: this renders inside a zebra-striped grid, so
+// a translucent fill would pick up whichever row colour sits behind it and read
+// differently on alternating rows.
+.range-track {
+  position: relative;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ig-gray-200);
+  min-width: 40px;
+}
+
+// The current price inside the band. `left` is a percentage from
+// `rangePosition()`, and the translate centres the dot on that point rather than
+// hanging it off the right of it.
+.range-marker {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  // Only 900 keeps the dot legible where it overlaps the track.
+  background: var(--ig-gray-900);
+  transform: translate(-50%, -50%);
+  // A ring in the rail's own backdrop, so the dot stays readable where it
+  // crosses the rail.
+  box-shadow: 0 0 0 1px var(--ig-gray-100);
+}
+
+// Same green/red the change columns use, so the dot says direction as well as
+// position: low in the band and green is a stock recovering, high and red is one
+// coming off its high.
+.range-marker.pos {
+  background: var(--ig-success-500);
+}
+
+.range-marker.neg {
+  background: var(--ig-error-500);
+}
+
+// Movers strip
+// Tab and list colours come from the desk's tokens; only sizing and the row grid
+// live here.
+
+.movers-panel {
+  flex: 0 0 168px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--ig-gray-100);
+  border-top: 1px solid var(--ig-gray-200);
+}
+
+// Each tab is a bordered cell, as tall as its label needs, and the three share
+// the pane's width equally.
+.movers-tabs {
+  --ig-size: var(--ig-size-small);
+
+  // The tab strip's minimum height has no public token: this is the variable
+  // the tabs read it from. Zero lets each cell be as tall as its label.
+  --header-min-height: 0;
+
+  flex: 1;
+  min-height: 0;
+  font-size: 11px;
+
+  &::part(inner) {
+    flex-grow: 1;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  igc-tab::part(tab-header) {
+    padding: 11px 16px;
+    border: 1px solid var(--ig-tabs-border-color);
+
+    &:hover {
+      border-color: var(--ig-tabs-border-color--hover);
+    }
+  }
+
+  igc-tab::part(content) {
+    font-weight: 500;
+    line-height: 14px;
+  }
+
+  igc-tab[selected]::part(content) {
+    font-weight: 600;
+  }
+}
+
+// A column, so that the empty message below can take the height the rows leave
+// and sit in the middle of it.
+.movers-list {
+  --ig-size: var(--ig-size-small);
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: none;
+  font-size: 11px;
+}
+
+.mover-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+// Set in the theme's own type, as an empty list's message is, rather than in the
+// desk's.
+.movers-empty {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 16px 10px;
+  text-align: center;
+  color: var(--ig-gray-700);
+  font-family: var(--ig-font-family);
+  font-size: 11px;
+}
+
+.mover-symbol {
+  color: var(--ig-gray-900);
+  font-weight: 700;
+}
+
+.mover-last {
+  color: var(--ig-gray-700);
+}
+
+.mover-change {
+  font-weight: 600;
+}

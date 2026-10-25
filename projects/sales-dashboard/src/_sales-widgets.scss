@@ -1,0 +1,365 @@
+@use "igniteui-theming" as *;
+@use "./sales-palette" as p;
+@use "./sales-tip" as tip;
+
+// Ink on a 12% wash of that same ink. Mixing the ground from the text colour
+// rather than from the family's 500 keeps every pairing above 4.5:1 whatever the
+// seed's lightness; a 500-based tint would leave the amber at 2.4:1.
+//
+// Two things about the ink itself.
+//
+// It is a `light-dark()` pair because a chromatic ramp does not invert: 900 is
+// the darkest end in *both* palettes, so on the dark panel it would be
+// near-black ink on a near-black wash. 400 is the shade that reads as the same
+// family there and still clears AA on its own wash: 5.7:1 at worst.
+//
+// And on the light side 900 alone is not deep enough. The palette's amber and
+// green are vivid by choice, which makes their 900 shallow: as pill ink they
+// measure 3.6:1 and 4.4:1 on their own wash. Carrying 75% of the family into
+// gray-900 keeps the hue plainly readable as green/amber/violet/blue/red and
+// takes the worst of the five to 4.9:1. 85% leaves the amber at 4.3:1, so 75%
+// is the floor rather than a round number.
+@mixin sd-pill($family) {
+  --sd-pill-ink: light-dark(
+    color-mix(in srgb, var(--ig-#{$family}-900) 75%, var(--ig-gray-900)),
+    var(--ig-#{$family}-400)
+  );
+
+  color: var(--sd-pill-ink);
+  background: color-mix(in srgb, var(--sd-pill-ink) 12%, var(--sd-surface-raised));
+}
+
+$sd-stages: (
+  "stage-win": success,
+  "stage-proposal": warn,
+  "stage-negotiation": primary,
+  "stage-qualified": info,
+);
+
+$sd-ranks: (1: primary, 2: warn, 3: secondary);
+
+@mixin sd-widgets() {
+  .metric-tile {
+    margin: 0;
+    width: 100%;
+    min-width: 0;
+    min-height: rem(105px);
+    overflow: hidden;
+  }
+
+  // The content part is a scroll container by default; the tile never needs to scroll.
+  .metric-body {
+    padding: rem(13px);
+    overflow: visible;
+  }
+
+  .metric-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: rem(7px);
+    min-width: 0;
+  }
+
+  .metric-label {
+    overflow: hidden;
+    color: var(--sd-muted);
+    font-size: p.$sd-text-sm;
+    font-weight: 500;
+    letter-spacing: rem(0.3px);
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .metric-icon {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+  }
+
+  .metric-value {
+    margin-top: rem(9px);
+    color: var(--ig-gray-900);
+    font-size: clamp(#{rem(26px)}, #{rem(20px)} + 1.1cqi, #{rem(34px)});
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  // A badge carrying its direction as an icon in its own content, so the arrow
+  // doubles the tint for colour-blind readers and reaches assistive tech.
+  //
+  // The fill stays the tinted pill the rest of the sample uses rather than the
+  // badge's solid `--ig-success-500`, for contrast: `sd-pill` is shade-900 ink
+  // on a 12% wash of itself, which the mixin's comment measures above 4.5:1 for
+  // every family. The pill is the badge's `base` part, which is a fixed-height
+  // counter by default, so this restates its box.
+  .metric-delta {
+    margin-top: rem(6px);
+
+    // The badge points its icon at `--ig-primary-900-contrast`, the contrast of
+    // the *primary* ramp, not of whatever the badge is actually filled with.
+    // That resolves to white, so on this pale wash the arrow would be invisible.
+    // `currentColor` ties it to the pill's own ink instead.
+    --ig-badge-icon-color: currentColor;
+
+    &::part(base) {
+      gap: rem(3px);
+      min-width: 0;
+      min-height: 0;
+      padding: rem(3px) rem(9px);
+      border-radius: rem(999px);
+      box-shadow: none;
+      font-size: p.$sd-text-sm;
+      font-weight: 600;
+      line-height: 1.2;
+
+      @include sd-pill(success);
+    }
+
+    &.negative::part(base) {
+      @include sd-pill(error);
+    }
+
+    // The badge shrinks icons to 0.625rem, which is too small to read as an
+    // arrow next to 14px text.
+    igc-icon {
+      --size: #{rem(15px)};
+    }
+  }
+
+  .stage-pill {
+    padding: rem(2px) rem(8px);
+    border-radius: rem(999px);
+    font-size: p.$sd-text-xs;
+    font-weight: 600;
+  }
+
+  @each $class, $family in $sd-stages {
+    .#{$class} {
+      @include sd-pill($family);
+    }
+  }
+
+  .chart-box,
+  .deals-chart {
+    flex: 1 1 auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .chart-box {
+    min-height: rem(248px);
+  }
+
+  .deals-chart {
+    min-height: rem(190px);
+  }
+
+  .donut-host {
+    position: relative;
+    margin: rem(4px) auto 0;
+  }
+
+  // The doughnut's tooltip anchors here, in the slice under the pointer.
+  .donut-anchor {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  // The tooltip box of the doughnut: an `igc-tooltip`, so it lives in this shadow root, where the
+  // palette is reachable, and takes its appearance from the host class like everything else.
+  //
+  // The box opens at the middle of the slice it describes, over that slice and the hole, so it must
+  // not take the pointer: a pointer that moved onto the box would leave the chart, and the box
+  // would be left open and empty.
+  igc-tooltip {
+    pointer-events: none;
+  }
+
+  igc-tooltip::part(base) {
+    @include tip.sd-chart-tip-box();
+
+    pointer-events: none;
+  }
+
+  :host(.dark-theme) igc-tooltip::part(base) {
+    @include tip.sd-chart-tip-box-dark();
+  }
+
+  @include tip.sd-chart-tip();
+
+  .subtle {
+    margin: 0;
+    color: var(--sd-muted);
+    font-size: p.$sd-text-base;
+  }
+
+  // The body-1 line of the type scale, which the paragraph would otherwise lose.
+  p.subtle {
+    line-height: rem(22px);
+  }
+
+  .trend-legend-swatch,
+  .legend-swatch {
+    display: inline-block;
+    width: rem(14px);
+    height: rem(14px);
+    border-radius: rem(2px);
+  }
+
+  .trend-legend {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: rem(4px) rem(14px);
+    color: var(--sd-muted);
+    font-size: p.$sd-text-sm;
+    font-weight: 500;
+  }
+
+  .trend-legend-item,
+  .legend-name-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(6px);
+  }
+
+  .legend-list {
+    display: grid;
+    gap: rem(7px);
+    margin: rem(16px) 0 0;
+    padding: rem(16px) 0 0;
+    border-top: rem(1px) solid var(--sd-line);
+    list-style: none;
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: p.$sd-text-sm;
+      font-weight: 500;
+    }
+  }
+
+  .legend-name,
+  .legend-value {
+    color: var(--ig-gray-900);
+  }
+
+  .legend-value {
+    min-width: rem(40px);
+    text-align: end;
+  }
+
+  // The list item spaces its start, content and end parts a rem apart, empty ones
+  // included; the row is the only content, so it takes the item's own padding alone.
+  igc-list-item {
+    gap: 0;
+  }
+
+  .leader-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: rem(8px);
+    width: 100%;
+  }
+
+  .leader-left {
+    display: flex;
+    align-items: center;
+    gap: rem(9px);
+  }
+
+  .leader-name {
+    font-size: p.$sd-text-base;
+    font-weight: 600;
+  }
+
+  .leader-right {
+    text-align: end;
+  }
+
+  .leader-amount {
+    font-weight: 600;
+  }
+
+  small {
+    color: var(--sd-muted);
+    font-size: p.$sd-text-sm;
+
+    // The same pair `sd-pill` uses, and for the same reason: error-900 is the
+    // deepest end of the ramp in *both* palettes, so on the dark panel it would be
+    // near-black-red at 3.3:1. 400 puts it at 7.4:1.
+    &.negative {
+      color: light-dark(var(--ig-error-900), var(--ig-error-400));
+    }
+  }
+
+  // Also reused by the metric-tile icons. `-contrast` picks black or white per
+  // background, so no text colour is assigned by hand.
+  // Ranks 4 and 5 land here, so this pair is on screen, not just a fallback.
+  // `-contrast` rather than gray-900 for the reason the ranked variants below
+  // already use it: the grey ramp inverts, so gray-900 is near-black ink on the
+  // light theme's gray-300 and near-white ink on the dark theme's: 3.6:1 there.
+  // The adaptive shade picks a side per background and reads 15.7:1 / 5.5:1.
+  .rank-badge {
+    --ig-avatar-background: var(--ig-gray-300);
+    --ig-avatar-color: var(--ig-gray-300-contrast);
+  }
+
+  @each $rank, $family in $sd-ranks {
+    .rank-badge.rank-#{$rank} {
+      --ig-avatar-background: var(--ig-#{$family}-500);
+      --ig-avatar-color: var(--ig-#{$family}-500-contrast);
+      --ig-avatar-icon-color: var(--ig-#{$family}-500-contrast);
+    }
+  }
+
+  .icon-avg {
+    --ig-avatar-background: var(--ig-success-500);
+    --ig-avatar-color: var(--ig-success-500-contrast);
+  }
+
+  .theme-toggle {
+    flex-shrink: 0;
+    margin-inline-start: rem(4px);
+
+    // The glyph stays the muted ink in every state; only its backdrop changes.
+    --ig-flat-icon-button-foreground: var(--sd-muted);
+    --ig-flat-icon-button-hover-foreground: var(--sd-muted);
+    --ig-flat-icon-button-focus-foreground: var(--sd-muted);
+    --ig-flat-icon-button-focus-hover-foreground: var(--sd-muted);
+    --ig-flat-icon-button-active-foreground: var(--sd-muted);
+  }
+
+  igc-grid .igx-grid-th__title {
+    font-family: p.$sd-font-condensed;
+    font-weight: 700;
+    letter-spacing: rem(0.4px);
+  }
+
+  // The grid sizes itself (its `height` is null in the template): the header, the rows and, when
+  // the seven columns do not fit, a horizontal scrollbar, whose height depends on the platform
+  // (16px with classic scrollbars, none with overlay ones). A height that is a percentage of the
+  // body would settle on one of its own, since the body is sized by the grid, and a height fixed
+  // in CSS cannot know whether the scrollbar is there.
+  //
+  // Stacked, the panel is as tall as the grid, which is never less than 250px. Beside the
+  // leaderboard the body is at least 286px, room for the header and five rows with a row to spare,
+  // and the grid, a stretched flex item, fills the body and keeps its scrollbar at the bottom.
+  .activity-grid {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: rem(250px);
+  }
+
+  @container sales-dashboard (width >= #{rem(1024px)}) {
+    .activity-panel .panel-body {
+      min-height: rem(286px);
+    }
+  }
+}

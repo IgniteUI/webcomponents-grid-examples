@@ -1,0 +1,16 @@
+{
+  "version": "$(cliVersion)",
+  "project": {
+    "defaultPort": 8000,
+    "framework": "webcomponents",
+    "projectTemplate": "$(projectTemplate)",
+    "projectType": "igc-ts",
+    "theme": "$(theme)",
+    "isBundle": false,
+    "components": [],
+    "sourceFiles": [],
+    "isShowcase": false,
+    "version": ""
+  },
+  "build": {}
+}

@@ -1,0 +1,20 @@
+@use "./sales-tip" as t;
+
+// Chart tooltips, as a document stylesheet.
+//
+// The charts move tooltip DOM to `<body>`, outside the dashboard's shadow root, which is why
+// these rules cannot live in the component's own stylesheet: they would never reach the box. The
+// dashboard adds this sheet to the document while it is on the page, and takes it away again.
+//
+// `!important` is not decoration. The package writes `border-color: transparent` *inline* on this
+// box, and inline wins over anything a stylesheet can say without it. The `:has()` keeps the
+// rules on the boxes that hold this sample's own template.
+.ui-tooltip-container:has(> .chart-tip) {
+  @include t.sd-chart-tip-box($important: true);
+}
+
+.ui-tooltip-container:has(> .chart-tip-dark) {
+  @include t.sd-chart-tip-box-dark($important: true);
+}
+
+@include t.sd-chart-tip();

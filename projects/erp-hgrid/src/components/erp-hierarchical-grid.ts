@@ -31,6 +31,7 @@ import { erpDataService } from "../services/erp-data.service";
 import { DataPoint } from '../models/DataPoint';
 import { OrderDetails } from '../models/OrderDetails';
 import { BadgeVariant } from '../models/BadgeVariant';
+import { prepareGridShadowRoot } from './grid-shadow-root';
 import erpStyles from "./erp-hierarchical-grid.scss?inline";
 
 
@@ -89,6 +90,8 @@ export default class ErpHierarchicalGrid extends LitElement {
   }
 
   firstUpdated() {
+    prepareGridShadowRoot(this.renderRoot as ShadowRoot);
+
     // Default sortings
     this.rowisland.sortingExpressions = [
       {

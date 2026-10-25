@@ -1,0 +1,25 @@
+{
+  "name": "sales-dashboard",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "igniteui-theming": "^29.1.1",
+    "igniteui-webcomponents": "^7.4.1",
+    "igniteui-webcomponents-charts": "^7.1.0",
+    "igniteui-webcomponents-core": "^7.1.0",
+    "igniteui-webcomponents-grids": "^7.3.2",
+    "lit": "^3.2.1",
+    "sass": "^1.86.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.7.2",
+    "vite": "^6.3.4",
+    "vite-plugin-static-copy": "^2.3.0"
+  }
+}

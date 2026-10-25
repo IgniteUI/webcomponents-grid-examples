@@ -5,6 +5,7 @@ import { customElement, property } from "lit/decorators.js";
 import 'igniteui-webcomponents-grids/grids/combined.js';
 import { check, gitIssue } from "@igniteui/material-icons-extended";
 import { Maintenance } from "../models/maintenance-history.model";
+import { prepareGridShadowRoot } from "./grid-shadow-root";
 
 
 defineComponents(IgcBadgeComponent, IgcIconComponent)
@@ -17,6 +18,10 @@ export class TripHistoryGrid extends LitElement {
 
         registerIconFromText(check.name, check.value, "imx-icons");
         registerIconFromText(gitIssue.name, gitIssue.value, 'imx-icons');
+    }
+
+    firstUpdated() {
+        prepareGridShadowRoot(this.renderRoot as ShadowRoot);
     }
 
     @property({ type: Array }) maintenanceData: Maintenance[] | undefined = [];
@@ -64,6 +69,16 @@ export class TripHistoryGrid extends LitElement {
         .status-value {
             padding-left: 8px;
             color: var(--primary-text-color);
+        }
+
+        /* Badges follow --ig-size since igniteui-webcomponents 6.4; keep their 22px size in the small grid. */
+        igc-badge {
+            --ig-badge-size: 1.375rem;
+        }
+
+        /* The icons are black: keep the 500 badge tone they read well on (Material uses a darker one since 6.4). */
+        igc-badge[variant="success"]::part(base) {
+            background: var(--ig-success-500);
         }
     `;
 }

@@ -1,0 +1,104 @@
+// Order blotter pane: working, filled and rejected orders for the session.
+
+@use "../styles/desk-shared" as desk;
+
+@include desk.pane;
+@include desk.quote-primitives;
+@include desk.scrollbars;
+@include desk.badges;
+
+.blotter-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--ig-gray-200);
+}
+
+.blotter-filters {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.blotter-filters igc-chip {
+  --ig-size: var(--ig-size-small);
+
+  font-size: 10px;
+}
+
+.filter-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.cancel-all {
+  --ig-size: var(--ig-size-small);
+
+  flex-shrink: 0;
+
+  &::part(base) {
+    font-size: 10px;
+  }
+
+  igc-icon {
+    --ig-size: var(--ig-size-small);
+  }
+}
+
+.grid-host {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.blotter-grid {
+  @include desk.desk-grid;
+}
+
+.side-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+// Opaque, like every other fill inside a grid row, and the same 10% over the
+// row's base that the tinted P&L cells use, so the side tag and the figures
+// beside it read as one fill rather than two near-misses.
+.side-buy {
+  color: var(--ig-success-500);
+  background: color-mix(in srgb, var(--ig-success-500) 10%, var(--ig-gray-50));
+}
+
+.side-sell {
+  color: var(--ig-error-500);
+  background: color-mix(in srgb, var(--ig-error-500) 10%, var(--ig-gray-50));
+}
+
+// Label ink for text inside a grid row: one step darker than the panel labels,
+// so it still clears AA on a selected and hovered row.
+.price-kind {
+  margin-inline-start: 5px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--ig-gray-800);
+}
+
+// Colour comes from the badge's variant; only sizing is set here.
+.status-badge {
+  --ig-size: var(--ig-size-small);
+}
+
+.note-cell {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ig-gray-800);
+  font-size: 11px;
+}

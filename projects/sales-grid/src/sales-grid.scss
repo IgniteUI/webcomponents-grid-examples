@@ -30,6 +30,20 @@
     background: var(--ig-grid-header-background, hsl(from var(--ig-surface-500) h s l/1));
 }
 
+// The title uses the grid toolbar's title class. Since igniteui-webcomponents-grids 7.3 that
+// class is styled only inside a grid toolbar, so its type style is applied here.
+.pivotToolbar .igx-grid-toolbar__title {
+    font-family: var(--ig-h6-font-family, var(--ig-font-family));
+    font-size: var(--ig-h6-font-size);
+    font-weight: var(--ig-h6-font-weight);
+    font-style: var(--ig-h6-font-style);
+    line-height: var(--ig-h6-line-height);
+    letter-spacing: var(--ig-h6-letter-spacing);
+    text-transform: var(--ig-h6-text-transform);
+    margin-top: var(--ig-h6-margin-top);
+    margin-bottom: var(--ig-h6-margin-bottom);
+}
+
 .pivotRow {
     display: flex;
     flex-direction: row;

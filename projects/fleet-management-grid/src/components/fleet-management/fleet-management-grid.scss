@@ -22,6 +22,21 @@ igc-tabs {
   width: 100%;
 }
 
+/* igniteui-webcomponents 7.4 sizes the tab strip and the selected tab's content to their content in the
+   Material theme; stretch them to the full width (fixed upstream in IgniteUI/igniteui-webcomponents#2431). */
+igc-tabs::part(inner) {
+  flex-grow: 1;
+}
+
+/* The light Material tabs use primary-900 for the selected tab since igniteui-webcomponents 7; keep primary-500 on this dark surface. */
+igc-tabs {
+  --ig-tabs-item-active-color: var(--ig-primary-500);
+  --ig-tabs-item-active-hover-color: var(--ig-primary-500);
+  --ig-tabs-item-active-icon-color: var(--ig-primary-500);
+  --ig-tabs-item-active-hover-icon-color: var(--ig-primary-500);
+  --ig-tabs-indicator-color: var(--ig-primary-500);
+}
+
 igc-divider {
   color: var(--ig-gray-200);
   opacity: 24%;
@@ -47,6 +62,24 @@ igc-divider {
 /* Global Grid Styles */
 .main-grid {
   --ig-size: var(--ig-size-small)
+}
+
+/* Badges follow --ig-size since igniteui-webcomponents 6.4; keep their 22px size in the small grid. */
+igc-badge {
+  --ig-badge-size: 1.375rem;
+}
+
+/* The status icons are black: keep the 500 badge tones they read well on (Material uses darker tones since 6.4). */
+igc-badge[variant="info"]::part(base) {
+  background: var(--ig-info-500);
+}
+
+igc-badge[variant="success"]::part(base) {
+  background: var(--ig-success-500);
+}
+
+igc-badge[variant="danger"]::part(base) {
+  background: var(--ig-error-500);
 }
 
 

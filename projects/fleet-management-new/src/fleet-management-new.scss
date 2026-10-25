@@ -1,0 +1,403 @@
+@use "./styles/utils" as *;
+@use "igniteui-theming" as *;
+@use "igniteui-theming/sass/typography/presets/fluent" as *;
+@use "igniteui-theming/sass/elevations/presets" as *;
+@use "./styles/palette" as *;
+@use "./styles/themes" as *;
+@use "./styles/detail" as *;
+
+/// A row action keeps the colour of the status it sets through hover, focus and press:
+/// only the background answers them.
+@mixin row-action-colour($colour) {
+  --ig-flat-icon-button-foreground: #{$colour};
+  --ig-flat-icon-button-hover-foreground: #{$colour};
+  --ig-flat-icon-button-focus-foreground: #{$colour};
+  --ig-flat-icon-button-focus-hover-foreground: #{$colour};
+  --ig-flat-icon-button-active-foreground: #{$colour};
+}
+
+:host {
+  // Dark is the default appearance. The palette, elevations and type scale are
+  // declared on the host, so they also apply inside the shell, whose page loads
+  // a different global theme. Both appearances run the light Fluent component
+  // sheets: the palette inverts the gray ramp off the surface, so the same sheets
+  // read correctly on either, and the few components that need the dark schema
+  // take it through the component themes in `styles/_themes.scss`.
+  @include theme($fleet-palette, $material-elevations, $typeface, $type-scale, "light");
+
+  color-scheme: dark;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+  color: var(--ig-gray-800);
+  background: var(--ig-gray-50);
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+  font-size: rem(14px);
+
+  // Sample-wide density, driven by the size selector in the filter row.
+  --ig-size: var(--ig-size-medium);
+
+  // Everything below is nested under the host, which gives the rules the weight of the
+  // library's own single-class selectors and keeps them inside this sample.
+  .igx-grid {
+    border-radius: rem(4px);
+  }
+
+  .igx-grid-toolbar {
+    // The filter box of the column hiding and pinning panels sits in the toolbar too.
+    igx-input-group {
+      --size: #{sizable(rem(24px), rem(32px), rem(38px))};
+    }
+
+    // The toolbar has no custom content: the container only holds the whitespace of the
+    // template, so it is collapsed as an empty one is.
+    .igx-grid-toolbar__custom-content {
+      display: none;
+    }
+
+    .igx-grid-toolbar__actions {
+      gap: sizable(rem(8px), rem(12px), rem(16px));
+    }
+  }
+
+  .fleet-shell {
+    // `ig-typography` switches the library's typography rules on for everything inside; it
+    // also sets the Fluent font, which the sample overrides on its host.
+    font-family: inherit;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: rem(16px);
+    padding: rem(20px);
+    overflow: hidden;
+  }
+
+  // Notifications sit at the bottom centre of the page, over the grid. The box is
+  // sized to its text and then inset by its side margins, so its message has 1rem
+  // less than it needs and wraps onto a second line; there is no action button, so
+  // its container takes no room.
+  igc-snackbar {
+    --margin-block: 0;
+
+    padding: 0;
+
+    &::part(base) {
+      width: calc(100% - 1rem);
+      margin-inline: auto;
+    }
+
+    // The message sizes to its text instead of taking half of the row.
+    &::part(message) {
+      flex: 0 1 auto;
+    }
+
+    &::part(action-container) {
+      display: none;
+    }
+  }
+
+  .fleet-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: rem(8px);
+    user-select: none;
+
+    h1 {
+      @include type-style("body-2") {
+        font-family: "DM Sans", "Segoe UI", sans-serif;
+        margin-block: rem(4px) 0;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+
+      display: inline-flex;
+      color: var(--ig-gray-800);
+    }
+  }
+
+  .fleet-reset {
+    flex-shrink: 0;
+    // Pushes itself, the theme toggle and the size selector to the far end.
+    margin-inline-start: auto;
+  }
+
+  .fleet-theme-toggle {
+    flex-shrink: 0;
+  }
+
+  .fleet-size-group {
+    flex-shrink: 0;
+
+    // A flex row of equal buttons, sized to the sum of their labels.
+    &::part(group) {
+      display: flex;
+    }
+  }
+
+  .igx-button,
+  igc-button,
+  igc-toggle-button {
+    span {
+      display: block;
+      text-box: cap alphabetic;
+    }
+  }
+
+  // The buttons of the size selector share the row equally, and may be narrower than their
+  // label: the label is centred and overflows into the button's padding.
+  igc-toggle-button {
+    min-width: 0;
+
+    span {
+      max-width: none;
+      overflow: visible;
+      text-overflow: clip;
+    }
+  }
+
+  // An outlined search box in the accent colour, as tall as the toolbar buttons beside it.
+  .fleet-search {
+    width: min(rem(320px), 40vw);
+    --ig-input-group-size: #{sizable(rem(24px), rem(32px), rem(38px))};
+    --ig-input-group-border-color: var(--ig-primary-500);
+    --ig-input-group-input-prefix-background: transparent;
+    --ig-input-group-input-prefix-color: var(--ig-primary-500);
+
+    // The toolbar lays its actions out as flex items, so the box has to claim the width itself.
+    &::part(container) {
+      flex: 1 1 auto;
+    }
+  }
+
+  .fleet-title-icon-wrap {
+    position: relative;
+    display: grid;
+    padding-inline-start: rem(4px);
+
+    igc-icon {
+      --size: 30px;
+      z-index: 3;
+    }
+
+    igc-icon:nth-child(2) {
+      position: absolute;
+      inset-inline-start: rem(1px);
+      opacity: 0.5;
+      z-index: 2;
+    }
+
+    igc-icon:nth-child(3) {
+      position: absolute;
+      inset-inline-start: rem(-2px);
+      opacity: 0.2;
+      z-index: 1;
+    }
+  }
+
+  .fleet-title-icon {
+    color: var(--ig-primary-500);
+  }
+
+  // Status filter chips
+  .fleet-chip-row {
+    display: flex;
+    align-items: center;
+    gap: rem(9px);
+    flex-wrap: wrap;
+  }
+
+  .fleet-chip {
+    font-weight: 400;
+  }
+
+  // Each status chip is outlined in its own family: the text is the family's main tone and
+  // the outline the next one down.
+  @each $variant, $family in (info: info, success: success, warning: warn) {
+    igc-chip[variant="#{$variant}"][outlined]::part(base) {
+      color: var(--ig-#{$family}-500);
+      border-color: var(--ig-#{$family}-600);
+    }
+  }
+
+  // Grid
+  .fleet-master-grid {
+    @include tokens($fleet-grid);
+
+    box-sizing: border-box;
+    height: 100%;
+    min-height: 0;
+    border: 1px solid $fleet-border;
+
+    // Scoped past the grid's own single-class rules, so no `!important` needed.
+    .igx-grid__th,
+    .igx-grid__td,
+    .igx-grid__drop-area {
+      font-size: rem(14px);
+    }
+
+    .igx-grid__hierarchical-indent {
+      margin: 0;
+    }
+  }
+
+  // Overlays the grid opens over itself. Both render inside the grid rather than
+  // at the body, so they take the palette from the host and only need lifting
+  // off the grid's own background - see `$fleet-overlay-background`.
+  igx-column-actions {
+    @include tokens($fleet-column-actions);
+
+    border: 1px solid $fleet-overlay-border;
+    border-radius: rem(4px);
+  }
+
+  igx-query-builder {
+    @include tokens($fleet-query-builder);
+  }
+
+  .igx-advanced-filter {
+    border: 1px solid $fleet-overlay-border;
+    border-radius: rem(4px);
+    // The dialog's footer sits outside `igx-query-builder`, so the query
+    // builder's own background stops at the last expression block.
+    background: $fleet-overlay-background;
+    overflow: hidden;
+  }
+
+  // The tooltip box of the donut.
+  .fleet-chart-tooltip-box::part(base) {
+    padding: rem(8px) rem(10px);
+    border: 1px solid $fleet-tooltip-border;
+    border-radius: rem(4px);
+    background: $fleet-tooltip-background;
+    color: var(--ig-gray-800);
+    font: #{rem(12px)} "DM Sans", "Segoe UI", sans-serif;
+    box-shadow: none;
+  }
+
+  // The value half of the donut's tooltip.
+  .fleet-chart-tooltip-value {
+    font-weight: 700;
+    color: var(--ig-gray-900);
+  }
+
+  .fleet-chart-tooltip {
+    display: grid;
+    gap: rem(2px);
+  }
+
+  .fleet-chart-tooltip-label {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: var(--ig-primary-500);
+  }
+
+  // Detail
+  @include fleet-detail-row;
+
+  // Status cell. The badge is `igc-badge`'s `dot` mode - 6/10/12px across the
+  // three sample sizes - so the gap is tuned to a dot.
+  .status-display {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(8px);
+    white-space: nowrap;
+  }
+
+  .badge-text {
+    color: var(--ig-gray-700);
+  }
+
+  // Each row action carries the colour of the status it sets, so the strip
+  // reads the same way the status column does: violet Active, green Available,
+  // orange Maintenance. The `title`/`aria-label` still name the action -
+  // colour is the second channel here, never the only one.
+  .fleet-row-action {
+    // 28px buttons with a 14px glyph; 32px and 18px at the large size.
+    --ig-flat-icon-button-size: #{sizable(rem(28px), rem(28px), rem(32px))};
+
+    &::part(icon) {
+      --size: #{sizable(rem(14px), rem(14px), rem(18px))};
+    }
+  }
+
+  .fleet-row-action-active {
+    @include row-action-colour(var(--ig-info-500));
+  }
+
+  .fleet-row-action-available {
+    @include row-action-colour(var(--ig-success-500));
+  }
+
+  .fleet-row-action-maintenance {
+    @include row-action-colour(var(--ig-warn-500));
+  }
+
+  // A ring drawn with box-shadow rather than a pseudo-element: the badge is
+  // `overflow: hidden`, which would clip a child but leaves its own outer
+  // shadow alone. Nothing here affects layout.
+  .status-badge-pulse {
+    animation: fleet-status-pulse 1.8s ease-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-badge-pulse {
+      animation: none;
+      box-shadow: 0 0 0 2px hsl(from var(--ig-warn-500) h s l / 0.5);
+    }
+  }
+
+  @media (width < 1000px) {
+    .fleet-detail-content,
+    .fleet-cost-charts,
+    .fleet-cost-donut-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .fleet-size-group {
+    @include tokens($fleet-btn-group);
+  }
+
+  .fleet-reset {
+    @include tokens($fleet-btn);
+  }
+
+  // Scoped to the row so only the status filters take it - the chips the grid
+  // renders in its group area keep the grid theme.
+  .fleet-chip-row {
+    @include tokens($fleet-chip);
+  }
+}
+
+:host(.fleet-size-small) {
+  --ig-size: var(--ig-size-small);
+}
+
+:host(.fleet-size-large) {
+  --ig-size: var(--ig-size-large);
+}
+
+// Light appearance. Only the palette is re-emitted - every colour in the
+// sample, and every component theme, is a palette reference, so they follow.
+// It sits on the host, beside the size classes, so the host's own background
+// switches with it.
+:host(.light-theme) {
+  @include palette($fleet-light-palette);
+
+  color-scheme: light;
+}
+
+// Scaled to the dot: the ring reads as a halo around a 10px indicator.
+@keyframes fleet-status-pulse {
+  from {
+    box-shadow: 0 0 0 0 hsl(from var(--ig-warn-500) h s l / 0.55);
+  }
+
+  to {
+    box-shadow: 0 0 0 rem(6px) hsl(from var(--ig-warn-500) h s l / 0);
+  }
+}
