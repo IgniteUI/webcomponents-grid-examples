@@ -1,0 +1,333 @@
+////
+/// Shared pane primitives for the Signal Desk sample.
+///
+/// Only the things Ignite UI does not already provide live here: the pane shell,
+/// tabular-numeral figures, positive/negative colouring, the ticker badge and the
+/// desk's scrollbars. Anything with a component behind it (chips, tabs, lists,
+/// button groups, badges, progress bars) is themed through the tokens in
+/// `_desk-tokens.scss` instead, so each pane's stylesheet stays layout-only.
+///
+/// Colour is never hard-coded: everything resolves through the `--ig-*` palette
+/// the desk declares on its host, so panes follow the theme swap.
+////
+
+/// Full-height flex column filling a dock pane.
+@mixin pane($direction: column) {
+  :host {
+    display: flex;
+    flex-direction: $direction;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--ig-surface-500);
+    box-sizing: border-box;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+
+/// Monospaced, tabular figures: used for every price and quantity.
+@mixin figures {
+  .mono {
+    font-family: "DM Mono", "Courier New", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/// Directional colouring. `.pos`/`.neg` for quotes, `.pos-pnl`/`.neg-pnl` for P&L.
+@mixin directional {
+  .pos,
+  .pos-pnl {
+    color: var(--ig-success-500);
+  }
+
+  .neg,
+  .neg-pnl {
+    color: var(--ig-error-500);
+  }
+}
+
+/// The heat map: every directional figure inside a grid on a tinted cell.
+///
+/// The light theme's bet, and only the light theme's: the chrome there is
+/// almost colourless (see `$sd-light-palette`), so the tables are free to carry
+/// the book's shape in the cell fills and be scanned before they are read. The
+/// dark desk already separates by field colour and would only be flattened by
+/// this, which is why it is behind the pane's `theme="light"` attribute.
+///
+/// Scoped to `igc-grid` on purpose: the same `.pos`/`.neg` classes colour the
+/// ticker deltas, the chart header, the order ticket's price ladder and the
+/// movers strip, and none of those is a table cell.
+///
+/// Fill only, no `display` and no border. 10% of the family over the row's own
+/// base is a fill the figure still clears 4.5:1 against, which is the whole
+/// constraint on how far the tint can go.
+@mixin tinted-figures {
+  :host([theme="light"]) igc-grid {
+    // The day-range marker is a dot on a rail rather than a figure, and it
+    // takes `.pos`/`.neg` for the same directional reason. A pill would make
+    // it an 8px dot in a 20px box.
+    .pos:not(.range-marker),
+    .neg:not(.range-marker),
+    .pos-pnl,
+    .neg-pnl {
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    .pos:not(.range-marker),
+    .pos-pnl {
+      background: color-mix(in srgb, var(--ig-success-500) 10%, var(--ig-gray-50));
+    }
+
+    .neg:not(.range-marker),
+    .neg-pnl {
+      background: color-mix(in srgb, var(--ig-error-500) 10%, var(--ig-gray-50));
+    }
+  }
+}
+
+/// Ticker badge shared by the grids.
+@mixin ticker {
+  .symbol-cell {
+    color: var(--ig-info-500);
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+}
+
+/// A pane's section label: "QUANTITY", "OPEN P&L" and friends.
+@mixin section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--ig-gray-700);
+}
+
+/// Compact grid sizing, shared by the desk's grids.
+@mixin desk-grid {
+  --ig-size: var(--ig-size-small);
+}
+
+/// The grid package's type rules are written under `.ig-typography`, a class
+/// the page's body carries; a page-level class cannot reach into a shadow root,
+/// so the element around each grid carries it. Its own font stays the desk's.
+@mixin grid-typography {
+  .ig-typography {
+    font-family: inherit;
+  }
+}
+
+/// The desk's segmented controls.
+///
+/// `igc-button-group` lays its buttons out as equal grid columns that shrink
+/// below their labels and cut them short. The desk's groups are a row instead,
+/// as wide as its labels together (a size's 42px floor included) and wider than
+/// the pane if that is what they take. Each button gets an equal share of that
+/// width, not its own label's, so a label longer than its share runs past the
+/// button's edges rather than being cut to an ellipsis. The labels sit on their
+/// cap height.
+@mixin button-groups {
+  igc-button-group {
+    max-width: none;
+  }
+
+  igc-button-group::part(group) {
+    display: flex;
+  }
+
+  igc-toggle-button {
+    min-width: 0;
+  }
+
+  igc-toggle-button::part(toggle) {
+    overflow: visible;
+  }
+
+  igc-toggle-button span {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    text-box: cap alphabetic;
+  }
+}
+
+/// A placeholder or value too long for its field ends in an ellipsis rather
+/// than a hard cut.
+@mixin input-ellipsis {
+  igc-input::part(input),
+  igc-select::part(native-input),
+  igc-combo::part(native-input) {
+    text-overflow: ellipsis;
+  }
+}
+
+/// The desk's badges.
+///
+/// The info badge fills with the deeper 700 step of its family, and every
+/// variant's text is derived from the fill it actually paints: left to the
+/// contrast of the *primary* ramp, a "live" or "Filled" chip would come out
+/// white on bright mint at 1.75:1.
+///
+/// A badge reads in the type around it at the medium size, body-2, and in the
+/// caption style at the small size.
+@mixin badges {
+  igc-badge::part(base) {
+    font-family: inherit;
+    font-size: var(--ig-body-2-font-size);
+    font-weight: var(--ig-body-2-font-weight);
+    line-height: var(--ig-body-2-line-height);
+    padding-inline: 6px;
+  }
+
+  igc-badge[variant="success"] {
+    --ig-badge-text-color: var(--ig-success-500-contrast);
+    --ig-badge-icon-color: var(--ig-success-500-contrast);
+  }
+
+  igc-badge[variant="info"] {
+    --ig-badge-text-color: var(--ig-info-700-contrast);
+    --ig-badge-icon-color: var(--ig-info-700-contrast);
+
+    &::part(base) {
+      background: var(--ig-info-700);
+    }
+  }
+}
+
+/// A small badge: 16px, in the caption style.
+@mixin small-badge {
+  --size: 1rem;
+
+  &::part(base) {
+    font-size: var(--ig-caption-font-size);
+    font-weight: var(--ig-caption-font-weight);
+    line-height: var(--ig-caption-line-height);
+    padding-inline: 4px;
+  }
+}
+
+/// Everything a pane that renders quotes needs, in one include.
+@mixin quote-primitives {
+  @include figures;
+  @include directional;
+  @include tinted-figures;
+  @include ticker;
+  @include grid-typography;
+}
+
+/// The desk's scrollbars, for the scrollers inside a pane.
+///
+/// A page-level `.ig-scrollbar` rule cannot reach into a shadow root, so each
+/// pane carries the same rules itself, reading the `--ig-scrollbar-sb-*` tokens
+/// the desk declares on its host.
+@mixin scrollbars {
+  :host {
+    --sb-size: var(--ig-scrollbar-sb-size, 1rem);
+    --sb-thumb-min-height: var(--ig-scrollbar-sb-thumb-min-height, 2rem);
+    --sb-thumb-bg-color: var(--ig-scrollbar-sb-thumb-bg-color, var(--ig-gray-300));
+    --sb-thumb-bg-color-hover: var(--ig-scrollbar-sb-thumb-bg-color-hover, var(--ig-gray-300));
+    --sb-thumb-border-color: var(--ig-scrollbar-sb-thumb-border-color, transparent);
+    --sb-thumb-border-size: var(--ig-scrollbar-sb-thumb-border-size, 0);
+    --sb-thumb-border-radius: var(--ig-scrollbar-sb-thumb-border-radius, 0);
+    --sb-track-bg-color: var(--ig-scrollbar-sb-track-bg-color, var(--ig-gray-100));
+    --sb-track-bg-color-hover: var(--ig-scrollbar-sb-track-bg-color-hover, var(--ig-gray-100));
+    --sb-track-border-color: var(--ig-scrollbar-sb-track-border-color, transparent);
+    --sb-track-border-size: var(--ig-scrollbar-sb-track-border-size, 0);
+    --sb-corner-bg: var(--ig-scrollbar-sb-corner-bg, var(--ig-gray-100));
+    --sb-corner-border-color: var(--ig-scrollbar-sb-corner-border-color, transparent);
+    --sb-corner-border-size: var(--ig-scrollbar-sb-corner-border-size, 0);
+  }
+
+  ::-webkit-scrollbar {
+    width: var(--sb-size);
+    height: var(--sb-size);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--sb-track-bg-color);
+  }
+
+  ::-webkit-scrollbar-track:hover,
+  ::-webkit-scrollbar-track:active {
+    background: var(--sb-track-bg-color-hover);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    min-height: var(--sb-thumb-min-height);
+    border-radius: var(--sb-thumb-border-radius);
+    border: var(--sb-thumb-border-size) solid var(--sb-thumb-border-color);
+    background-clip: content-box;
+    background-color: var(--sb-thumb-bg-color);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--sb-thumb-bg-color-hover);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: var(--sb-corner-bg);
+    border: var(--sb-corner-border-size) solid var(--sb-corner-border-color);
+  }
+
+  ::-webkit-scrollbar-track-piece {
+    border: var(--sb-track-border-size) solid var(--sb-track-border-color);
+  }
+}
+
+/// The desk's lists take the type around them, as the rest of a pane's content
+/// does. A list with no thumbnails or trailing actions (`.plain-list`) keeps no
+/// room for them either: an empty start or end section would still take its
+/// gap.
+@mixin lists {
+  igc-list,
+  igc-list-item {
+    font-family: inherit;
+  }
+
+  .plain-list igc-list-item::part(start),
+  .plain-list igc-list-item::part(end) {
+    display: none;
+  }
+}
+
+/// Chrome shared by the news wire and the alerts list: a pinned action row
+/// above a scrolling `igc-list`.
+@mixin feed-list {
+  .panel-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .panel-actions {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--ig-gray-200);
+  }
+
+  .item-list {
+    --ig-size: var(--ig-size-small);
+
+    flex: 1 1 auto;
+    min-height: 0;
+    border: none;
+    overflow: auto;
+  }
+
+  .list-empty {
+    margin: 0;
+    padding: 18px 12px;
+    text-align: center;
+    color: var(--ig-gray-700);
+    font-size: 11px;
+  }
+}

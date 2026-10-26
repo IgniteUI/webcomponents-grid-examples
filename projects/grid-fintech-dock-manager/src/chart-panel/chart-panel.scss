@@ -1,0 +1,178 @@
+// Chart document pane.
+
+@use "../styles/desk-shared" as desk;
+
+@include desk.pane;
+@include desk.figures;
+@include desk.directional;
+@include desk.button-groups;
+
+.chart-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.chart-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ig-gray-200);
+}
+
+.price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chart-symbol {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.chart-ticker {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ig-info-500);
+  letter-spacing: 0.3px;
+}
+
+.chart-name {
+  font-size: 11px;
+  color: var(--ig-gray-700);
+}
+
+.price-line {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+
+// Holding the header still
+//
+// Everything below re-renders on every tick, and a digit coming or going
+// changes how wide it is, which in a flex row re-measures the whole header, so
+// the OHLC list and the position chip would slide sideways once a second.
+// Each figure gets a floor on its box, sized to the widest value it carries, and
+// `text-align: end` keeps the right edge still.
+.current-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ig-gray-900);
+  line-height: 1.1;
+}
+
+.price-change {
+  min-width: 7.25rem;
+  text-align: end;
+}
+
+.ohlc-stats {
+  display: flex;
+  gap: 10px;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ohlc-stats__label {
+  font-size: 11px;
+  color: var(--ig-gray-700);
+}
+
+.stat-item {
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+  justify-items: end;
+}
+
+.position-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 9px;
+  border-radius: 4px;
+  border: 1px solid currentcolor;
+  line-height: 1.25;
+}
+
+// The held position is a P&L figure like any in the grids, so in the light
+// theme it takes the same tinted cell. Lighter than the grids' 10% because this
+// one keeps its border as well.
+:host([theme="light"]) {
+  .position-chip.pos {
+    background: color-mix(in srgb, var(--ig-success-500) 7%, var(--ig-gray-50));
+  }
+
+  .position-chip.neg {
+    background: color-mix(in srgb, var(--ig-error-500) 7%, var(--ig-gray-50));
+  }
+}
+
+.chip-qty {
+  font-size: 10px;
+  opacity: 0.85;
+}
+
+.chip-pl {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chart-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-bottom: 1px solid var(--ig-gray-200);
+  background: var(--ig-gray-100);
+}
+
+.chart-group {
+  --ig-size: var(--ig-size-small);
+
+  flex-grow: 1;
+  align-self: flex-start;
+
+  igc-icon {
+    --ig-size: var(--ig-size-small);
+  }
+}
+
+.chart-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+// The price pane starts at the top of the chart area, with no gap above it.
+igc-financial-chart {
+  --financial-pane-margin-top: 0px;
+}
+
+// The volume and RSI panes: a financial chart is several charts stacked, and
+// the price pane is the one the tooltip properties reach. The others keep the
+// package's DOM tooltip, a box the chart package draws from a stylesheet it adds
+// to the document head. That stylesheet does not reach into this pane's shadow
+// root, where the chart renders the box, so the box is drawn here, in the desk's
+// colours; the light variant follows the palette. The border colour is bound
+// inline, so only `!important` outranks it.
+igc-tooltip-container .ui-tooltip-container {
+  padding: 8px;
+  border: 1px solid var(--ig-gray-300) !important;
+  border-radius: 4px;
+  background: var(--ig-gray-100);
+  color: var(--ig-gray-900);
+  font: 11px "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+}

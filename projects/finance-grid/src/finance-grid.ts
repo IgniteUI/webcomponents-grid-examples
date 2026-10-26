@@ -5,6 +5,7 @@ import { TRENDING_DOWN, TRENDING_UP } from "./assets/icons/icons";
 import { configureTheme, defineComponents, IgcAvatarComponent, IgcIconComponent, IgcInputComponent, IgcLinearProgressComponent, registerIconFromText } from "igniteui-webcomponents";
 import { FilteringLogic, IgcCellTemplateContext, IgcColumnPipeArgs, IgcFilteringExpressionsTree, IgcGridComponent, IgcStringFilteringOperand } from "igniteui-webcomponents-grids/grids";
 import "igniteui-webcomponents-grids/grids/combined.js";
+import { prepareGridShadowRoot } from "./grid-shadow-root";
 import financeStyles from "./finance-grid.scss?inline";
 
 defineComponents(IgcAvatarComponent, IgcIconComponent, IgcLinearProgressComponent, IgcInputComponent);
@@ -22,6 +23,10 @@ export default class FinanceGrid extends LitElement {
       dataService.updateAllPrices(this.grid.data);
       this.grid.markForCheck();
     }, this.updateTimerInMs);
+  }
+
+  firstUpdated() {
+    prepareGridShadowRoot(this.renderRoot as ShadowRoot);
   }
 
   disconnectedCallback() {

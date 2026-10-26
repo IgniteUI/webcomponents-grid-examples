@@ -5,6 +5,7 @@ import { configureTheme, defineComponents, IgcAvatarComponent, IgcButtonComponen
 import { IgcTreeGridComponent, IgcCellTemplateContext } from "igniteui-webcomponents-grids/grids";
 import { icons } from "./assets/icons/Icons";
 import { DataService } from "./services/data.service";
+import { prepareGridShadowRoot } from "./grid-shadow-root";
 import styles from "./hr-portal.scss?inline";
 
 defineComponents(IgcAvatarComponent, IgcIconComponent, IgcTreeGridComponent, IgcIconButtonComponent, IgcButtonComponent);
@@ -33,6 +34,10 @@ export default class HrPortal extends LitElement {
     this.dataService.fetchData().then((data) => {
       this.data = data;
     });
+  }
+
+  firstUpdated() {
+    prepareGridShadowRoot(this.renderRoot as ShadowRoot);
   }
 
   @query("igc-tree-grid")

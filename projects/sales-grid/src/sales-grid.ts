@@ -23,6 +23,7 @@ import {
 } from "igniteui-webcomponents-grids/grids";
 
 import 'igniteui-webcomponents-grids/grids/combined.js';
+import { prepareGridShadowRoot } from './grid-shadow-root';
 import salesGridStyles from './sales-grid.scss?inline';
 
 import ARROW_DOWN_SVG from "./assets/images/icons/arrow_drop_down.svg";
@@ -230,7 +231,9 @@ export class SalesGrid extends LitElement {
             new IgcPivotDateDimension({
                 memberName: 'Date',
                 displayName: 'All Periods',
-                enabled: true
+                enabled: true,
+                // Show the leaf dates as the data has them (M/D/YYYY), not in the grid's short date style
+                headerFormatter: (value: unknown) => value
             },
                 {
                     fullDate: true,
@@ -268,7 +271,9 @@ export class SalesGrid extends LitElement {
             new IgcPivotDateDimension({
                 memberName: 'Date',
                 displayName: 'All Periods',
-                enabled: true
+                enabled: true,
+                // Show the leaf dates as the data has them (M/D/YYYY), not in the grid's short date style
+                headerFormatter: (value: unknown) => value
             },
                 {
                     fullDate: true,
@@ -351,6 +356,8 @@ export class SalesGrid extends LitElement {
     }
 
     protected firstUpdated(_changedProperties: PropertyValues): void {
+        prepareGridShadowRoot(this.renderRoot as ShadowRoot);
+
         // Workaround for not setting pivot data selector grid ref once available.
         this.requestUpdate();
     }

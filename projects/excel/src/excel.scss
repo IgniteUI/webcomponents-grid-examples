@@ -1,0 +1,123 @@
+@use "./styles/utils" as *;
+@use "igniteui-theming/sass/typography/presets/fluent" as *;
+@use "igniteui-theming/sass/elevations/presets" as *;
+@use "igniteui-theming/sass/color/presets/light/fluent" as *;
+
+// The page colour of the workbook. The Spreadsheet paints a cell that has no fill of its own
+// transparently, so this is the colour of every empty cell, and of the error message below.
+// `styles/index.css` sets the same colour on the standalone page, for the moment before this
+// element exists.
+$page-background: #f3f5f7;
+
+// The Fluent light palette, elevations and type scale are declared on the host, so they
+// also apply inside the shell, whose page loads a different global theme.
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background: $page-background;
+  font-family: var(--ig-font-family);
+  @include theme($palette, $material-elevations, $typeface, $type-scale, "light");
+}
+
+.excel-sample {
+  // The spreadsheet has no height of its own: `igc-spreadsheet height="100%"` resolves against
+  // this container, which resolves against the host. Every element in that chain has to pass the
+  // height down, so this section needs to be a flex column too: leaving it a plain block breaks
+  // the chain and collapses the whole sample to zero height.
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.excel-status {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  color: var(--ig-gray-700);
+  // The body type style that the Ignite UI typography gives paragraphs on the page.
+  font-family: var(--ig-body-1-font-family, var(--ig-font-family));
+  font-size: var(--ig-body-1-font-size);
+  font-weight: var(--ig-body-1-font-weight);
+  font-style: var(--ig-body-1-font-style);
+  line-height: var(--ig-body-1-line-height);
+  letter-spacing: var(--ig-body-1-letter-spacing);
+  text-transform: var(--ig-body-1-text-transform);
+}
+
+.excel-spreadsheet-container {
+  flex: 1;
+  min-height: 0;
+}
+
+// The Spreadsheet's chrome (formula bar, sheet tabs, scrollbars) is laid out for border-box
+// sizing, which the Ignite UI themes apply to everything under an `ig-*` element but which
+// does not reach into this shadow root.
+igc-spreadsheet,
+igc-spreadsheet *,
+igc-spreadsheet *::before,
+igc-spreadsheet *::after {
+  box-sizing: border-box;
+}
+
+// The formula bar is a text area, so it is the one place where the Spreadsheet shows a native
+// scrollbar: it gets one when the text of the selected cell is longer than the bar. The page's
+// `ig-scrollbar` class sets `scrollbar-color`, and the property inherits into this shadow root.
+// Where it is set, the browser ignores the `::-webkit-scrollbar` rules that the same theme
+// provides for the flat Fluent scrollbar, and draws its own, with arrow buttons. So the standard
+// properties are reset here and the flat scrollbar is drawn from the same rules and colours as
+// the theme's. Browsers that do not have `::-webkit-scrollbar` keep the theme's standard
+// properties.
+@supports selector(::-webkit-scrollbar) {
+  igc-spreadsheet {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+
+    ::-webkit-scrollbar {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--ig-gray-100);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      min-height: 2rem;
+      background-clip: content-box;
+      background-color: var(--ig-gray-300);
+    }
+
+    ::-webkit-scrollbar-corner {
+      background: var(--ig-gray-100);
+    }
+
+    // The theme leaves the scrollbar to the system where the primary input cannot hover.
+    @media (hover: none) {
+      ::-webkit-scrollbar {
+        width: auto;
+        height: auto;
+      }
+    }
+  }
+}
+
+// Chart legends: the legend list takes the page font and colour, and only the text cells are
+// set to 12px, so that a legend row is as tall as its badge. The data visualization styles
+// that are adopted into this shadow root would otherwise give the whole list 13px and a
+// lighter colour. They are adopted after this sheet, so these rules are made more specific to
+// win. (The bare `canvas` selector of their badge rule, which would restyle every canvas of the
+// Spreadsheet, is left out when the styles are copied, see `spreadsheet-shadow-root.ts`.)
+igc-spreadsheet {
+  .ig-chart-legend-items-list {
+    font: inherit;
+    color: inherit;
+  }
+
+  .ig-chart-legend-item-text {
+    font: 12px Verdana, Arial, sans-serif;
+  }
+}

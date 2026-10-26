@@ -1,0 +1,28 @@
+@import "igniteui-webcomponents/themes/light/fluent.css";
+
+html,
+body {
+  height: 100%;
+  /* The page colour of the workbook (the same as `:host` in excel.scss): the Spreadsheet paints
+     cells without a fill transparently, and the page shows its colour until the workbook loads. */
+  background: #f3f5f7;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--ig-font-family);
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
