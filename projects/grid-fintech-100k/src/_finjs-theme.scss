@@ -1,0 +1,87 @@
+@use "igniteui-theming" as *;
+@use "igniteui-theming/sass/themes/schemas" as *;
+
+// Emitted inside the themed subtree, not on the host: a var() inside a custom property is
+// substituted where that property is declared.
+@mixin finjs-component-themes() {
+  // grid-theme() is composed: the toolbar, excel filtering, paginator and buttons all derive from
+  // these primary tokens.
+  //
+  // The grid draws its own outline from `grid-border-color`. It is the one token that cannot take a
+  // single shade. The gray ramp inverts off the surface, but not symmetrically in contrast terms:
+  // `gray-300` is a 1.3:1 hairline on white and a 5.1:1 line on the dark surface, which would make
+  // every rule in the grid four times heavier after a theme flip. The pair keeps the weight even.
+  $finjs-grid: grid-theme(
+    $schema: $light-fluent-schema,
+    $background: var(--ig-surface-500),
+    $foreground: var(--ig-gray-900),
+    $accent-color: var(--ig-primary-500),
+    $grid-border-color: light-dark(var(--ig-gray-300), var(--ig-gray-100))
+  );
+
+  // The size selector. The selected state is stated because it should read as the accent rather
+  // than as a gray fill; everything else derives from the schema, and the palette carries it across
+  // both appearances.
+  //
+  // `$item-border-color` is the one exception, for the same reason the grid's border is a pair: the
+  // schema points it at `gray-600`, which is a 3.4:1 border on white but inverts to a near-white
+  // 13:1 outline on the dark surface. `gray-300` is the shade that sits at the same relative step in
+  // the inverted ramp: 5.1:1, still clearing 1.4.11's 3:1 for a control boundary.
+  $finjs-btn-group: button-group-theme(
+    $schema: $light-fluent-schema,
+    $item-border-color: light-dark(var(--ig-gray-600), var(--ig-gray-300)),
+    $item-selected-background: var(--ig-primary-500),
+    $item-selected-text-color: var(--ig-primary-500-contrast),
+    $item-selected-border-color: var(--ig-primary-500),
+    $item-selected-hover-border-color: var(--ig-primary-500)
+  );
+
+  // The scrollbars are the one part of the sample the palette cannot reach on its own. The theme
+  // declares the `--sb-*` tokens on `.ig-scrollbar`, so the `var(--ig-gray-300)` inside them is
+  // substituted where that class sits, against whatever palette is live there. Re-declaring the
+  // tokens inside the sample re-binds them to the sample's own palette.
+  //
+  // The thumb is a light-dark() pair for the same reason the grid's border is: the gray ramp inverts
+  // off the surface, so the shade that reads as a quiet thumb on white is a bright one on the dark
+  // surface.
+  $finjs-scrollbar: scrollbar-theme(
+    $schema: $light-fluent-schema,
+    $sb-thumb-bg-color: var(--finjs-sb-thumb),
+    $sb-thumb-bg-color-hover: light-dark(var(--ig-gray-400), var(--ig-gray-300)),
+    $sb-track-bg-color: var(--ig-surface-500),
+    $sb-corner-bg: var(--ig-surface-500)
+  );
+
+  // On the host rather than on the grid so the excel-style filter overlays are covered by the same
+  // pair.
+  --finjs-sb-thumb: light-dark(var(--ig-gray-300), var(--ig-gray-200));
+
+  // `scoped` emits the short `--sb-*` names that the `::-webkit-scrollbar` rules read directly, so
+  // they are resolved here. The default mode emits the `--ig-scrollbar-sb-*` override layer, which
+  // only the `.ig-scrollbar` declaration reads.
+  @include tokens($finjs-scrollbar, $mode: "scoped");
+
+  // The standard `scrollbar-color` is what current browsers paint, and it would otherwise inherit
+  // the colours of whichever palette its declaration sits in.
+  scrollbar-color: var(--finjs-sb-thumb) var(--ig-surface-500);
+
+  igc-grid {
+    @include tokens($finjs-grid);
+
+    border-radius: rem(4px);
+  }
+
+  .finjs-size-group {
+    @include tokens($finjs-btn-group);
+  }
+}
+
+// The list of the dropdown editors. The grid's theme sets the drop-down tokens on the grid itself, tinting the
+// focused, hovered and selected items with the grid's accent, and a list that opens inside a cell inherits
+// them. The editor is meant to read as the palette's plain Fluent drop-down (a gray selected item, an
+// outlined focused item), so the schema's own values are stated again on the editor, closer than the grid.
+@mixin finjs-select-editor-theme() {
+  $finjs-drop-down: drop-down-theme($schema: $light-fluent-schema);
+
+  @include tokens($finjs-drop-down);
+}

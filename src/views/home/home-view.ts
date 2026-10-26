@@ -9,6 +9,12 @@ import "../hr-portal/hr-portal-view";
 import "../erp-hgrid/erp-hgrid-view";
 import "../fleet-management/fleet-management-view";
 import "../sales/sales-view";
+import "../finance-grid-new/finance-grid-new-view";
+import "../grid-fintech-100k/grid-fintech-100k-view";
+import "../sales-dashboard/sales-dashboard-view";
+import "../fleet-management-new/fleet-management-new-view";
+import "../grid-fintech-dock-manager/grid-fintech-dock-manager-view";
+import "../excel/excel-view";
 
 import "../charts/bar-chart/bar-chart-view";
 import "../charts/column-chart/column-chart-view";
@@ -39,8 +45,14 @@ export default class HomeView extends LitElement {
     { key: 'inventory' },
     { key: 'hr-portal' },
     { key: 'finance' },
+    { key: 'finance-grid-new' },
+    { key: 'grid-fintech-100k' },
     { key: 'sales' },
+    { key: 'sales-dashboard' },
     { key: 'fleet' },
+    { key: 'fleet-management-new' },
+    { key: 'grid-fintech-dock-manager' },
+    { key: 'excel' },
   ];
   @property({ type: Array }) tabsCharts = [
     { key: 'column-chart' },
@@ -87,6 +99,28 @@ export default class HomeView extends LitElement {
       },
     ],
     [
+      "finance-grid-new",
+      {
+        title: "New Financial Portfolio",
+        theme: "Fluent",
+        themeMode: 'Light',
+        content: "Asset tracking, profit and loss analysis, featuring interactive dynamic charts.",
+        moreLink: "https://www.infragistics.com/products/ignite-ui-web-components/web-components/components/grids/data-grid",
+        downloadLink: "https://www.infragistics.com/resources/sample-applications",
+      },
+    ],
+    [
+      "grid-fintech-100k",
+      {
+        title: "FinTech 100K",
+        theme: "Fluent",
+        themeMode: 'Light',
+        content: "A 100,000-row, 41-column instrument grid with Excel-style filtering, editing, sizing and export.",
+        moreLink: "https://www.infragistics.com/products/ignite-ui-web-components/web-components/components/grids/data-grid",
+        downloadLink: "https://www.infragistics.com/resources/sample-applications",
+      },
+    ],
+    [
       "sales",
       {
         title: "Sales Dashboard",
@@ -98,6 +132,17 @@ export default class HomeView extends LitElement {
       },
     ],
     [
+      "sales-dashboard",
+      {
+        title: "Sales KPI Dashboard",
+        theme: "Fluent",
+        themeMode: 'Light',
+        content: "KPI cards, revenue and deals charts, revenue by region, recent activity and a leaderboard.",
+        moreLink: "https://www.infragistics.com/products/ignite-ui-web-components/web-components/components/grids/data-grid",
+        downloadLink: "https://www.infragistics.com/resources/sample-applications",
+      },
+    ],
+    [
       "fleet",
       {
         title: "Fleet Management",
@@ -106,6 +151,39 @@ export default class HomeView extends LitElement {
         content: "A master-detail grid for managing vehicle acquisition, operations, and maintenance.",
         moreLink: "https://www.infragistics.com/products/ignite-ui-web-components/web-components/components/grids/grid/master-detail",
         downloadLink: "https://www.infragistics.com/resources/sample-applications/fleet-management-sample-app-web-components",
+      },
+    ],
+    [
+      "fleet-management-new",
+      {
+        title: "New Fleet Management",
+        theme: "Fluent",
+        themeMode: 'Dark',
+        content: "A master-detail grid for managing vehicle acquisition, operations, and maintenance.",
+        moreLink: "https://www.infragistics.com/products/ignite-ui-web-components/web-components/components/grids/grid/master-detail",
+        downloadLink: "https://www.infragistics.com/resources/sample-applications",
+      },
+    ],
+    [
+      "grid-fintech-dock-manager",
+      {
+        title: "FinTech Dock Manager",
+        theme: "Fluent",
+        themeMode: 'Dark',
+        content: "A trading desk in a Dock Manager: watchlist, positions and order grids, financial charts and a live market feed.",
+        moreLink: "https://www.infragistics.com/products/ignite-ui-web-components/web-components/components/layouts/dock-manager",
+        downloadLink: "https://www.infragistics.com/resources/sample-applications",
+      },
+    ],
+    [
+      "excel",
+      {
+        title: "Budget Planning Workbook",
+        theme: "Fluent",
+        themeMode: 'Light',
+        content: "A retail budget planning workbook in the Spreadsheet, with formulas, filterable tables and charts.",
+        moreLink: "https://www.infragistics.com/products/ignite-ui-web-components/web-components/components/spreadsheet-overview",
+        downloadLink: "https://www.infragistics.com/resources/sample-applications",
       },
     ],
   ]);

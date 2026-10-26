@@ -1,0 +1,35 @@
+@use "sass:map";
+@use "igniteui-theming" as *;
+
+@function is-root() {
+  @each $selector in & {
+    @return $selector == null;
+  }
+}
+
+@mixin theme($palette, $elevations, $typeface, $type-scale, $variant) {
+  $root: is-root();
+  $scope: if($root, ":root", "&");
+
+  #{$scope} {
+    --ig-theme: #{map.get($palette, "_meta", "variant")};
+    --ig-theme-variant: #{$variant};
+    --ig-spacing: 1;
+    --ig-spacing-inline: 1;
+    --ig-spacing-block: 1;
+    --ig-size-small: 1;
+    --ig-size-medium: 2;
+    --ig-size-large: 3;
+    --ig-scrollbar-size: #{rem(16px)};
+  }
+
+  #{$scope}[dir="rtl"] {
+    --ig-dir: -1;
+  }
+
+  @include palette($palette);
+  @include elevations($elevations);
+  // The element rules (`h1`..`h6`, `p`) stay at zero specificity, as in the grid's own theme, so a component's
+  // own heading styles (the column panel's title) are not outranked by the type scale.
+  @include typography($font-family: $typeface, $type-scale: $type-scale, $allow-exclusion: true);
+}

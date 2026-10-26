@@ -31,7 +31,9 @@
 
 .tab-container {
   width: 100%;
-  overflow: hidden;
+  // Scrolls only when the tabs no longer fit (narrow viewports), so every tab stays reachable.
+  overflow-x: auto;
+  overflow-y: hidden;
   flex-shrink: 0;
   display: flex;
   flex-direction: row;

@@ -1,0 +1,286 @@
+@use "igniteui-theming" as *;
+@use "./signal-desk-theme" as sd;
+
+////
+/// Component themes for the desk.
+///
+/// Each theme states a few decisions and the theming package derives the rest.
+/// Every colour is a `var(--ig-*)` palette reference, so the tokens follow the
+/// palette that is live where they are declared: they are emitted on the host,
+/// next to the palette, and re-resolve when it changes.
+////
+
+/// The grid carries the two decisions the palette comment calls "two accents,
+/// not three" and "gridlines drop to a tint".
+///
+/// `$accent-color` alone would have covered every state below: it is what the
+/// grid derives selection, hover and the active-cell ring from. It derives them
+/// all as tints of one colour, though, and the accent has to stay blue for the
+/// ring and the sort icons. So the states are stated: the interactive fills come
+/// off the neutral ladder and blue is left holding only the things that are a
+/// line or a glyph rather than a field.
+///
+/// The rules are `$sd-hairline`, a tint of the border step rather than the step
+/// itself. Four grids' worth of row and column rules at full border weight is
+/// most of the line noise on a white field, and the row fills already say where a
+/// row begins.
+@mixin grid-tokens() {
+  $grid: grid-theme(
+    $background: var(--ig-gray-50),
+    $foreground: var(--ig-gray-900),
+    $accent-color: var(--ig-primary-500),
+
+    $header-background: var(--ig-gray-100),
+    $header-text-color: var(--ig-gray-700),
+    $header-border-color: var(--ig-gray-200),
+    $grid-border-color: var(--ig-gray-200),
+    $summaries-border-color: var(--ig-gray-200),
+
+    $row-odd-background: var(--ig-gray-50),
+    $row-even-background: var(--sd-zebra),
+    $row-odd-text-color: var(--ig-gray-900),
+    $row-even-text-color: var(--ig-gray-900),
+    $row-border-color: sd.$sd-hairline,
+
+    $row-hover-background: sd.$sd-fill-hover,
+    $row-hover-text-color: var(--ig-gray-900),
+    $row-selected-background: sd.$sd-fill-selected,
+    $row-selected-text-color: var(--ig-gray-900),
+    $row-selected-hover-background: sd.$sd-fill-selected-hover,
+    $row-selected-hover-text-color: var(--ig-gray-900),
+    $cell-selected-background: sd.$sd-fill-selected,
+    $cell-selected-text-color: var(--ig-gray-900),
+    $cell-selected-within-background: sd.$sd-fill-selected-hover,
+    $cell-selected-within-text-color: var(--ig-gray-900),
+    $group-row-background: var(--ig-gray-100),
+    $group-row-selected-background: sd.$sd-fill-selected,
+
+    // Blue keeps the focus ring, the row-drag marker and the sort glyphs: a line
+    // and two icons, none of them a fill.
+    $cell-active-border-color: var(--ig-primary-500),
+    $row-highlight: var(--ig-primary-500),
+    $sorted-header-icon-color: var(--ig-primary-500),
+    $sortable-header-icon-hover-color: var(--ig-primary-500),
+
+    $filtering-header-background: var(--ig-gray-100),
+    $filtering-header-text-color: var(--ig-gray-900),
+    $filtering-row-background: var(--ig-gray-100),
+    $filtering-row-text-color: var(--ig-gray-900),
+    $pinned-border-color: var(--ig-gray-300)
+  );
+
+  @include tokens($grid);
+}
+
+/// Borderless outlined buttons in the grid toolbar, so its actions read as a row
+/// of icons rather than four boxed controls: the toolbar's own bottom rule
+/// already says where the strip ends.
+///
+/// Every state has to be named. The library derives each border from that
+/// state's foreground, so anything left out keeps a border and the row flickers
+/// a box on hover or focus. `disabled` is in the list because the exporter
+/// disables itself while an export runs, the one state that arrives on its own
+/// rather than under the pointer.
+@mixin grid-toolbar-action-tokens() {
+  $outline-button: outlined-button-theme(
+    $border-color: transparent,
+    $hover-border-color: transparent,
+    $focus-border-color: transparent,
+    $focus-visible-border-color: transparent,
+    $active-border-color: transparent,
+    $disabled-border-color: transparent,
+    $foreground: var(--ig-gray-700)
+  );
+
+  @include tokens($outline-button);
+}
+
+/// The Buy action: a contained button on the gain colour.
+@mixin buy-button-tokens() {
+  @include tokens(contained-button-theme($background: var(--ig-success-500)));
+}
+
+/// The Sell action: a contained button on the loss colour.
+@mixin sell-button-tokens() {
+  @include tokens(contained-button-theme($background: var(--ig-error-500)));
+}
+
+/// The component themes. Module-level so the host and the grids' embedded
+/// components read the same decisions.
+$dialog: dialog-theme(
+  $background: var(--ig-gray-100)
+);
+
+$snackbar: snackbar-theme(
+  $background: var(--ig-gray-200),
+  $text-color: var(--ig-gray-900),
+  $button-color: sd.$sd-accent-on-fill
+);
+
+$navdrawer: navdrawer-theme(
+  $background: linear-gradient(180deg, var(--ig-gray-100) 0%, var(--ig-surface-500) 100%),
+  $border-color: var(--ig-gray-200),
+  $item-text-color: var(--ig-gray-700),
+  $item-icon-color: var(--ig-gray-700),
+  $item-hover-background: sd.$sd-fill-hover,
+  $item-hover-text-color: var(--ig-gray-900),
+  $item-hover-icon-color: var(--ig-gray-900),
+  $item-active-background: sd.$sd-fill-selected,
+  $item-active-text-color: sd.$sd-accent-on-fill,
+  $item-active-icon-color: sd.$sd-accent-on-fill,
+  $item-header-text-color: var(--ig-gray-700)
+);
+
+$input-group: input-group-theme(
+  $search-background: var(--ig-gray-50),
+  $border-color: var(--ig-gray-300),
+  $hover-border-color: var(--ig-primary-500),
+  $focused-border-color: var(--ig-primary-500),
+  $border-background: var(--ig-gray-50),
+  $idle-text-color: var(--ig-gray-700),
+  $filled-text-color: var(--ig-gray-900),
+  $focused-text-color: var(--ig-gray-900),
+  $placeholder-color: var(--ig-gray-700),
+  $input-prefix-color: var(--ig-gray-700),
+  $input-prefix-background: transparent,
+  $input-suffix-color: var(--ig-gray-700),
+  $input-suffix-background: transparent
+);
+
+$avatar: avatar-theme(
+  $background: var(--ig-gray-200),
+  $color: var(--ig-gray-900)
+);
+
+$button-group: button-group-theme(
+  $shadow: none,
+  $item-background: var(--ig-gray-50),
+  $item-text-color: var(--ig-gray-700),
+  $item-border-color: var(--ig-gray-200),
+  $item-hover-border-color: var(--ig-gray-200),
+  $item-hover-background: sd.$sd-fill-hover,
+  $item-hover-text-color: var(--ig-gray-900),
+  $item-selected-background: var(--ig-gray-50),
+  $item-selected-text-color: sd.$sd-accent-on-fill,
+  $item-selected-border-color: var(--ig-gray-200),
+  $item-selected-hover-border-color: var(--ig-gray-200),
+  $item-selected-hover-background: sd.$sd-fill-hover,
+  $item-selected-active-background: var(--ig-gray-200),
+  $item-active-background: var(--ig-gray-200),
+  $disabled-text-color: var(--ig-gray-500),
+  $disabled-background-color: var(--ig-gray-100)
+);
+
+$chip: chip-theme(
+  $background: var(--ig-gray-100),
+  $text-color: var(--ig-gray-700),
+  $border-color: var(--ig-gray-200),
+  $hover-background: sd.$sd-fill-hover,
+  $hover-text-color: var(--ig-gray-900),
+  $selected-background: sd.$sd-fill-selected,
+  $selected-text-color: sd.$sd-accent-on-fill,
+  $selected-border-color: var(--ig-primary-500),
+  $hover-selected-background: sd.$sd-fill-selected-hover,
+  $hover-selected-text-color: sd.$sd-accent-on-fill
+);
+
+$tabs: tabs-theme(
+  $item-background: var(--ig-gray-100),
+  $item-text-color: var(--ig-gray-700),
+  $item-icon-color: var(--ig-gray-700),
+  $item-hover-background: sd.$sd-fill-hover,
+  $item-hover-color: var(--ig-gray-900),
+  $item-active-color: sd.$sd-accent-on-fill,
+  $item-active-icon-color: sd.$sd-accent-on-fill,
+  $item-active-background: sd.$sd-fill-selected,
+  $indicator-color: var(--ig-primary-500),
+  $border-color: var(--ig-gray-200)
+);
+
+$list: list-theme(
+  $background: var(--ig-gray-100),
+  $item-background: var(--ig-gray-100),
+  $item-background-hover: sd.$sd-fill-hover,
+  $item-background-active: sd.$sd-fill-selected,
+  $item-text-color: var(--ig-gray-900),
+  $item-title-color: var(--ig-gray-900),
+  $item-subtitle-color: var(--ig-gray-700),
+  $header-background: var(--ig-gray-100),
+  $header-text-color: var(--ig-gray-700),
+  $border-color: var(--ig-gray-200)
+);
+
+$progress: progress-linear-theme(
+  $track-color: var(--ig-gray-200),
+  $fill-color-default: var(--ig-primary-500),
+  $fill-color-success: var(--ig-success-500),
+  $fill-color-warning: var(--ig-warn-500),
+  $fill-color-danger: var(--ig-error-500),
+  $text-color: var(--ig-gray-700)
+);
+
+$badge: badge-theme(
+  $shadow: none
+);
+
+// Every scrollbar value the library ships is a chain of fallbacks that ends in
+// a private default derived from the grid's own colours: a mid grey on a
+// near-black track inside a grid, against the Dock Manager's blue-black. Stating
+// the theme fills the link in that chain that outranks the private default
+// everywhere, so one declaration covers every scroller.
+//
+// The thumb sits at 1.5:1 against its track in both appearances, which is under
+// 1.4.11's 3:1 and a deliberate call. The tokens are 1rem wide, so a thumb that
+// clears the bar is a solid bar down the edge of every scrolling pane: louder
+// than any platform scrollbar and louder than the data beside it. The hover
+// step is what makes it findable. Mirrored by `--igc-sb-thumb-bg-color` on the
+// Dock Manager; the two have to move together.
+$scrollbar: scrollbar-theme(
+  $sb-size: 1rem,
+  $sb-thumb-min-height: 2rem,
+  $sb-thumb-bg-color: var(--ig-gray-300),
+  $sb-thumb-bg-color-hover: var(--ig-gray-500),
+  $sb-track-bg-color: var(--ig-gray-100),
+  $sb-track-bg-color-hover: var(--ig-gray-100),
+  $sb-corner-bg: var(--ig-gray-100)
+);
+
+/// Everything else the desk themes, declared on the host.
+@mixin component-tokens() {
+  @include tokens($dialog);
+  @include tokens($snackbar);
+  @include tokens($navdrawer);
+  @include tokens($input-group);
+  @include tokens($avatar);
+  @include tokens($button-group);
+  @include tokens($chip);
+  @include tokens($tabs);
+  @include tokens($list);
+  @include tokens($progress);
+  @include tokens($badge);
+  @include tokens($scrollbar);
+  @include grid-tokens();
+}
+
+/// The components the grid package renders inside its own menus and rows (the
+/// filter menus, the filtering row, the advanced filter). They are the grid
+/// package's, and they declare their own tokens on their containers, which beat
+/// the host's inherited ones: so the same themes are stated again on the elements
+/// themselves, as a stylesheet scoped to the elements would.
+@mixin grid-embedded-tokens() {
+  igx-input-group {
+    @include tokens($input-group);
+  }
+
+  igx-chip {
+    @include tokens($chip);
+  }
+
+  igx-buttongroup {
+    @include tokens($button-group);
+  }
+
+  igx-list {
+    @include tokens($list);
+  }
+}

@@ -1,0 +1,223 @@
+@use "./styles/utils" as *;
+@use "igniteui-theming" as *;
+@use "igniteui-theming/sass/typography/presets/fluent" as *;
+@use "igniteui-theming/sass/elevations/presets" as *;
+@use "./finjs-palette" as p;
+@use "./finjs-theme" as t;
+@use "./finjs-trends" as tr;
+
+// Layout only; colour lives in _finjs-palette.scss.
+//
+// The palette, elevations and type scale are declared on the host, so they also apply inside the
+// shell, whose page loads a different global theme.
+:host {
+  // Light is the default appearance.
+  @include theme(p.$finjs-palette, $material-elevations, $typeface, $type-scale, "light");
+  @include p.finjs-aliases();
+  @include t.finjs-component-themes();
+  @include tr.finjs-trends();
+
+  color-scheme: light;
+  display: block;
+  height: 100%;
+  width: 100%;
+  font-family: var(--ig-font-family);
+
+  // Sample-wide density, driven by the size selector in the grid toolbar.
+  --ig-size: var(--ig-size-medium);
+}
+
+:host([size="small"]) {
+  --ig-size: var(--ig-size-small);
+}
+
+:host([size="large"]) {
+  --ig-size: var(--ig-size-large);
+}
+
+// Dark appearance. Only the palette is re-emitted: every colour in the sample and every component
+// theme is a palette reference, so they follow. It sits on the host beside the size attribute so
+// the excel-style filter overlays the grid opens inside itself are covered too.
+:host([theme="dark"]) {
+  @include palette(p.$finjs-dark-palette);
+
+  color-scheme: dark;
+}
+
+@include typography-rules();
+
+.finjs-grid-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: rem(15px);
+  box-sizing: border-box;
+  background: var(--ig-gray-100);
+}
+
+.finjs-grid {
+  flex: 1 0 0%;
+}
+
+// The toolbar has an area for custom content, which this sample does not use. The grid hides it with
+// `:empty`, but the white space between the elements of the template counts as content, so it is hidden
+// here: left showing, it takes a 1rem margin from the room the title and the actions share.
+.igx-grid-toolbar__custom-content {
+  display: none;
+}
+
+.finjs-title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: rem(8px);
+  user-select: none;
+
+  h1 {
+    @include type-style("h6") {
+      margin: 0;
+    }
+
+    color: var(--ig-gray-900);
+  }
+}
+
+// The row count, subordinate to the name it follows.
+.finjs-row-count {
+  @include type-style("caption");
+
+  color: var(--ig-gray-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.finjs-size-group,
+.finjs-theme-toggle {
+  flex-shrink: 0;
+}
+
+.finjs-icons {
+  display: flex;
+  align-items: center;
+  gap: rem(4px);
+
+  // A step below the icon's smallest preset (1.125rem).
+  igc-icon {
+    --ig-icon-size: #{rem(16px)};
+  }
+}
+
+.igx-excel-filter {
+  span,
+  header,
+  input {
+    font-size: rem(13px);
+  }
+}
+
+// The grid's Fluent style makes the border of a list item that is the last of its type transparent.
+// The value list of the Excel-style menu is virtualized, with one wrapper per item, so every item is
+// the last of its type and the separators between the rows vanish. This rule is outside the grid's
+// cascade layer, so it wins over that one; the last item keeps its transparent border.
+.igx-excel-filter .igx-virtual-item:not(:last-child) .igx-list__item-base {
+  border-bottom-color: var(--border-color);
+}
+
+.igx-grid__td--number {
+  text-align: start;
+  justify-content: flex-start;
+}
+
+// The size buttons share the group's width equally, as flex items do, and the group is as wide as the
+// three labels side by side. The labels are the size names in capitals; they may run into the
+// button's padding rather than being cut with an ellipsis, and the cap trim keeps them centred
+// against the icon button beside them. The toggle button draws a 1px border on each side, which can
+// leave its label box narrower than the text (MEDIUM); the label is as wide as its text, so that it
+// stays centred instead of overflowing on one side.
+.finjs-size-group {
+  --ig-button-font-size: #{rem(12px)};
+  --ig-button-font-weight: 500;
+  --ig-button-text-transform: uppercase;
+  --ig-button-margin-top: 0;
+  --ig-button-margin-bottom: 0;
+
+  &::part(group) {
+    display: flex;
+  }
+
+  igc-toggle-button {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+
+  span {
+    min-width: max-content;
+    overflow: visible;
+    text-box: cap alphabetic;
+    text-overflow: clip;
+  }
+}
+
+// The dropdown editor of the Contract and Region columns fills the cell, which already draws the
+// editing outline, so the field itself has no border and no fill of its own and sits at the height of
+// a text editor rather than at the height of the row. The chevron keeps the select's own colour, which
+// the Fluent theme resolves against the primary tone: white in the light appearance and black in the
+// dark one, so it barely shows against the field in either.
+//
+// The open list takes its look from the palette's plain Fluent drop-down rather than from the grid
+// (see `finjs-select-editor-theme()`). The select sizes it to the cell, which would cut the longer
+// labels off, so it is as wide as its widest item and no narrower than 8rem. It is `base` that is
+// widened: it draws the list's background and shadow and clips what overflows it. Its shadow is the
+// drop-down token's, because the select's Fluent style fixes it a level higher.
+.finjs-select-editor {
+  @include t.finjs-select-editor-theme();
+
+  --ig-input-group-size: #{rem(20px)};
+  --ig-input-group-border-color: transparent;
+  --ig-input-group-hover-border-color: transparent;
+  --ig-input-group-focused-border-color: transparent;
+  --ig-input-group-input-suffix-background: transparent;
+  --ig-input-group-input-suffix-background--filled: transparent;
+  --ig-input-group-input-suffix-background--focused: transparent;
+  --ig-select-toggle-button-background: transparent;
+  --ig-select-toggle-button-background-focus: transparent;
+
+  display: block;
+  width: 100%;
+
+  // The value starts 7px into the field, and the room around the chevron is 6px on its left and 5px on
+  // its right (the field's own border takes the other pixel). With the library's padding there (10px each
+  // side at the medium size) a long value would be cut 10px sooner.
+  &::part(native-input) {
+    padding-inline: rem(7px) rem(8px);
+    font-size: rem(13px);
+  }
+
+  &::part(toggle-icon) {
+    padding-inline: rem(6px) rem(5px);
+  }
+
+  &::part(base) {
+    min-width: rem(128px);
+    width: max-content;
+    box-shadow: var(--ig-drop-down-elevation);
+  }
+}
+
+// The field's height, and with it the place where the list opens, and the room around the chevron
+// follow the size.
+:host([size="small"]) .finjs-select-editor {
+  --ig-input-group-size: #{rem(18px)};
+
+  &::part(toggle-icon) {
+    padding-inline: rem(4px) rem(3px);
+  }
+}
+
+:host([size="large"]) .finjs-select-editor {
+  --ig-input-group-size: #{rem(24px)};
+
+  &::part(toggle-icon) {
+    padding-inline: rem(8px) rem(7px);
+  }
+}

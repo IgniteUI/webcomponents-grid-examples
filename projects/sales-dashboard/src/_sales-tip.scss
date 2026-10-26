@@ -1,0 +1,58 @@
+@use "igniteui-theming" as *;
+@use "./sales-palette" as p;
+
+// The content of a chart tooltip, as the tooltip templates stamp it.
+//
+// The palette is unreachable from the box the charts put on `<body>`, because `--ig-*` is declared
+// on the dashboard's host. So these are literals, the same way `SALES_CHART_THEMES` is and for the
+// same reason, and they are the shades that theme names, kept in step by hand: gray-50/700/900 on
+// the light palette, gray-100/300/900 on the dark one. The dark appearance is the template's
+// `chart-tip-dark` class rather than a class on `<body>`, since the template knows which
+// appearance it was built for.
+@mixin sd-chart-tip() {
+  .chart-tip {
+    --sd-tip-label: #445d7e;
+    --sd-tip-value: #17202b;
+
+    display: grid;
+    gap: rem(2px);
+  }
+
+  .chart-tip-dark {
+    --sd-tip-label: #a3bad6;
+    --sd-tip-value: #f8fafc;
+  }
+
+  .chart-tip-label {
+    color: var(--sd-tip-label);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: rem(0.3px);
+  }
+
+  .chart-tip-value {
+    color: var(--sd-tip-value);
+    font-weight: 700;
+  }
+}
+
+// The box of a tooltip. `$important` is for the document stylesheet, which has to outrank an
+// inline declaration.
+@mixin sd-chart-tip-box($important: false) {
+  $flag: if($important, " !important", "");
+
+  padding: rem(7px) rem(10px) #{$flag};
+  border: rem(1px) solid #445d7e #{$flag};
+  border-radius: rem(4px) #{$flag};
+  background: #f8f9fb #{$flag};
+  box-shadow: none #{$flag};
+  font-family: p.$sd-font #{$flag};
+  font-size: p.$sd-text-xs #{$flag};
+}
+
+@mixin sd-chart-tip-box-dark($important: false) {
+  $flag: if($important, " !important", "");
+
+  border-color: #5d85b7 #{$flag};
+  background: #29405c #{$flag};
+}

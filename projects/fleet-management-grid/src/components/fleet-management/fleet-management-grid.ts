@@ -22,6 +22,7 @@ import { computePosition, flip, offset, shift } from "@floating-ui/dom";
 import { Driver } from "../../models/driver.model";
 import { Vehicle } from "../../models/vehicle.model";
 import { STATUS_ICON_MAP, STATUS_TYPE_MAP } from "../../models/status.mapping";
+import { prepareGridShadowRoot } from "../grid-shadow-root";
 import fleetStyles from "./fleet-management-grid.scss?inline";
 
 
@@ -78,6 +79,8 @@ export class FleetManagementGrid extends LitElement {
   }
 
   firstUpdated() {
+    prepareGridShadowRoot(this.renderRoot as ShadowRoot);
+
     this.mainGrid.sortingExpressions = [
       { dir: SortingDirection.Asc, fieldName: "vehicleId", ignoreCase: true }
     ]
@@ -135,16 +138,8 @@ export class FleetManagementGrid extends LitElement {
 
     return html`
       <igc-tabs>
-        <igc-tab panel="details">
-          <span>Details</span>
-        </igc-tab>
-        <igc-tab panel="trip-history"><span>Trip History</span></igc-tab>
-        <igc-tab panel="maintenance"><span>Maintenance</span></igc-tab>
-        <igc-tab panel="cost"><span>Cost</span></igc-tab>
-        <igc-tab panel="utilization"><span>Utilization</span></igc-tab>
-
-
-        <igc-tab-panel id="details">
+        <igc-tab>
+          <span slot="label">Details</span>
           <div class="details-container">
             <div class="carousel-container">
               <igc-carousel>
@@ -181,22 +176,25 @@ export class FleetManagementGrid extends LitElement {
               `)}
             </div>
           </div>
-        </igc-tab-panel>
+        </igc-tab>
 
-        <igc-tab-panel id="trip-history">
+        <igc-tab>
+          <span slot="label">Trip History</span>
           <trip-history-grid 
             .tripHistoryData="${dataService.findTripHistoryById(ctx.implicit.vehicleId)}"
             @driver-cell-click="${(event: CustomEvent) => this.showDriverOverlay(event)}">
           </trip-history-grid>
-        </igc-tab-panel>
+        </igc-tab>
 
 
-        <igc-tab-panel id="maintenance">
+        <igc-tab>
+          <span slot="label">Maintenance</span>
           <maintenance-grid .maintenanceData="${dataService.findMaintenanceDataById(ctx.implicit.vehicleId)}"></maintenance-grid>
-        </igc-tab-panel>
+        </igc-tab>
 
 
-        <igc-tab-panel id="cost">
+        <igc-tab>
+          <span slot="label">Cost</span>
           <div class="dashboard">
             <div class="chart-container pie-chart-container">
               <div class="chart-header">
@@ -295,10 +293,11 @@ export class FleetManagementGrid extends LitElement {
               </div>
             </div>
           </div>
-        </igc-tab-panel>
+        </igc-tab>
 
 
-        <igc-tab-panel id="utilization">
+        <igc-tab>
+          <span slot="label">Utilization</span>
           <div class="content-wrapper">
             <div class="chart-content utilization-chart-container">
               <h3>Utilization per Month</h3>
@@ -329,7 +328,7 @@ export class FleetManagementGrid extends LitElement {
               </igc-category-chart>
             </div>
           </div>
-        </igc-tab-panel>
+        </igc-tab>
       </igc-tabs>
     `
   }

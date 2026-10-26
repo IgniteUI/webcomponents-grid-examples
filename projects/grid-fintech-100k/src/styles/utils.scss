@@ -1,0 +1,59 @@
+@use "sass:map";
+@use "igniteui-theming" as *;
+
+@function is-root() {
+  @each $selector in & {
+    @return $selector == null;
+  }
+}
+
+@mixin theme($palette, $elevations, $typeface, $type-scale, $variant) {
+  $root: is-root();
+  $scope: if($root, ":root", "&");
+
+  #{$scope} {
+    --ig-theme: #{map.get($palette, "_meta", "variant")};
+    --ig-theme-variant: #{$variant};
+    --ig-spacing: 1;
+    --ig-spacing-inline: 1;
+    --ig-spacing-block: 1;
+    --ig-size-small: 1;
+    --ig-size-medium: 2;
+    --ig-size-large: 3;
+    --ig-scrollbar-size: #{rem(16px)};
+  }
+
+  #{$scope}[dir="rtl"] {
+    --ig-dir: -1;
+  }
+
+  @include palette($palette);
+  @include elevations($elevations);
+
+  // The type scale, as the variables that `type-style()` reads. `typography()` would also write the
+  // heading rules, nested under `:host`; those belong at the top level (see `typography-rules()`).
+  #{$scope} {
+    --ig-font-family: #{$typeface};
+    --ig-base-font-size: #{$base-font-size};
+
+    @each $name, $style in map.remove($type-scale, "_meta") {
+      @include type-style-vars($name, $style);
+    }
+  }
+}
+
+// The rules that give native headings (`h1`..`h6`, `p`) and the `ig-typography__*` classes their type
+// style inside an `.ig-typography` element. They are written at the top level of the sheet, as the
+// global theme does: nested under `:host` each rule gains a class of specificity and the element rules
+// then outrank the classes the grid puts on its own headings (the custom filter dialog's title), while
+// the class rules come out as `:host .ig-typography :host .ig-typography__h6` and match nothing.
+//
+// With `$allow-exclusion` the element part of each rule has zero specificity, as in the grid's own theme,
+// and elements marked `data-no-typography` are skipped, so a component's own heading styles (the column
+// panel's title) are not outranked by the type scale.
+@mixin typography-rules() {
+  .ig-typography {
+    @include type-style-elements($allow-exclusion: true);
+    @include type-style-classes();
+  }
+}

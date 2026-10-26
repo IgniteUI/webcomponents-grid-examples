@@ -1,0 +1,26 @@
+{
+  "name": "excel",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "igniteui-theming": "^29.1.1",
+    "igniteui-webcomponents": "^7.4.1",
+    "igniteui-webcomponents-charts": "^7.1.0",
+    "igniteui-webcomponents-core": "^7.1.0",
+    "igniteui-webcomponents-excel": "^7.1.0",
+    "igniteui-webcomponents-spreadsheet": "^7.1.0",
+    "igniteui-webcomponents-spreadsheet-chart-adapter": "^7.1.0",
+    "lit": "^3.2.1",
+    "sass": "^1.86.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.7.2",
+    "vite": "^6.3.4"
+  }
+}

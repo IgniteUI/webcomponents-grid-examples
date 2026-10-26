@@ -1,0 +1,94 @@
+@use "igniteui-theming" as *;
+@use "igniteui-theming/sass/typography/presets/fluent" as fluent;
+@use "igniteui-theming/sass/elevations/presets" as *;
+@use "./sales-palette" as p;
+@use "./sales-theme" as t;
+@use "./sales-layout" as l;
+@use "./sales-widgets" as w;
+
+// Wiring only.
+//
+// The host is the dashboard grid and the query container both. That is why the
+// track list here is fixed at four columns: a container query styles a
+// container's descendants, never the container itself, so the steps in
+// _sales-layout.scss move the tiles and panels across these tracks instead.
+//
+// The palette, elevations and type scale are declared on the host, so they also
+// apply inside the shell, whose page loads a different global theme.
+:host {
+  // The component themes follow this design system. The light component variant
+  // is kept in the dark appearance too, with the dark palette below doing the
+  // flip.
+  --ig-theme: fluent;
+  --ig-theme-variant: light;
+  --ig-spacing: 1;
+  --ig-spacing-inline: 1;
+  --ig-spacing-block: 1;
+  --ig-size-small: 1;
+  --ig-size-medium: 2;
+  --ig-size-large: 3;
+  --ig-scrollbar-size: #{rem(16px)};
+
+  @include palette(p.$sd-palette);
+  @include elevations($material-elevations);
+  @include typography($font-family: p.$sd-font, $type-scale: fluent.$type-scale);
+  @include p.sd-aliases();
+
+  container: sales-dashboard / inline-size;
+  color-scheme: light;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: p.$sd-gap;
+  width: 100%;
+
+  // Fills the viewport, and scrolls when the tiles need more room than the
+  // container has. The rows are implicit and content-sized, so this is the only
+  // place the height is decided.
+  min-height: 100dvh;
+  overflow: auto;
+
+  // Every band exactly as tall as what is in it.
+  //
+  // The implicit rows default to `auto`, and an `auto` row containing a
+  // stretch-aligned item with a `min-height` resolves to that `min-height`
+  // rather than to the item's content: the metric tiles have `min-height: 105px`
+  // and need 140px, so the row would be 105px, the card squashed into it, and
+  // the remaining 35px on a scrollbar inside the card. `max-content` sizes the
+  // row from the content instead.
+  //
+  // It also removes the reason to stretch: `align-content` cannot grow a
+  // `max-content` track, so a tall viewport leaves space at the bottom instead
+  // of inflating every band to fill it.
+  grid-auto-rows: max-content;
+  align-content: start;
+  padding: p.$sd-pad;
+  box-sizing: border-box;
+  background: var(--ig-surface-500);
+  color: var(--ig-gray-800);
+  font-family: p.$sd-font;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Dark appearance. Only the palette and three aliases are re-emitted:
+// everything else in the sample is a palette reference or an alias, so it
+// follows. It sits on the host so `color-scheme` covers the whole subtree,
+// which is what makes the `light-dark()` pair in `sd-pill` resolve.
+//
+// `--sd-muted` and `--sd-line` are restated because the grey ramp inverts by
+// *step*, not by contrast: gray-700 is 6.7:1 on the white panel but 13.2:1 on
+// the dark one, which stops reading as a muted label and starts reading as
+// body text. gray-500 puts it back at 7.9:1, and gray-100 matches the
+// hairline's 1.3:1.
+:host(.dark-theme) {
+  @include palette(p.$sd-dark-palette);
+
+  --sd-surface-raised: #{p.$sd-raised-dark};
+  --sd-muted: var(--ig-gray-500);
+  --sd-line: var(--ig-gray-100);
+  color-scheme: dark;
+}
+
+@include t.sd-component-themes();
+@include l.sd-layout();
+@include w.sd-widgets();

@@ -5,6 +5,7 @@ import { customElement, property } from "lit/decorators.js";
 import { dataService } from "../services/data.service";
 import 'igniteui-webcomponents-grids/grids/combined.js';
 import { Trip } from "../models/trip-history.model";
+import { prepareGridShadowRoot } from "./grid-shadow-root";
 
 defineComponents(IgcAvatarComponent, IgcBadgeComponent)
 configureTheme('material');
@@ -13,7 +14,11 @@ configureTheme('material');
 export class TripHistoryGrid extends LitElement {
 
     constructor() {
-        super();        
+        super();
+    }
+
+    firstUpdated() {
+        prepareGridShadowRoot(this.renderRoot as ShadowRoot);
     }
 
     @property({ type: Array }) tripHistoryData: Trip[] | undefined = []
@@ -110,6 +115,11 @@ export class TripHistoryGrid extends LitElement {
 
         .current-badge-text {
             margin: 0 8px;
+        }
+
+        /* Badges follow --ig-size since igniteui-webcomponents 6.4; keep their 22px size in the small grid. */
+        igc-badge {
+            --ig-badge-size: 1.375rem;
         }
     `;
 }

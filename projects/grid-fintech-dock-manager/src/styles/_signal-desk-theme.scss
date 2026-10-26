@@ -1,0 +1,160 @@
+@use "igniteui-theming" as *;
+
+/// Dark palette: the sample's default appearance.
+///
+/// The gray ramp is written out rather than seeded, which is the one thing
+/// `palette()` cannot express: it derives the whole family from a single colour,
+/// and the desk wants ten hand-picked blue-tinted steps. Everything else goes
+/// through `shades()` over `$IColorShades`, the engine's own shade list, so the
+/// families carry exactly the variants `palette()` would have given them.
+///
+/// `-raw` is not a duplicate of the line above it. `shades()` emits one per step
+/// and `color()` reads it to hand back an `rgba()` a Sass function can compute
+/// with, where the plain key resolves to a `var(--ig-*)` reference. Written ramps
+/// have to supply it themselves or `color($palette, 'gray', 500)` degrades.
+$sd-dark-palette: (
+  "primary": shades("primary", #5486cf, $IColorShades),
+  "secondary": shades("secondary", #5486cf, $IColorShades),
+  "surface": shades("surface", #12121a, $IColorShades),
+  "info": shades("info", #5486cf, $IColorShades),
+  "success": shades("success", #34d399, $IColorShades),
+  "warn": shades("warn", #fbbf24, $IColorShades),
+  "error": shades("error", #ce0e2f, $IColorShades),
+  "gray": (
+    "50": #0a0d14,
+    "50-contrast": adaptive-contrast(#0a0d14),
+    "50-raw": #0a0d14,
+    "100": #141e2e,
+    "100-contrast": adaptive-contrast(#141e2e),
+    "100-raw": #141e2e,
+    "200": #1e2d44,
+    "200-contrast": adaptive-contrast(#1e2d44),
+    "200-raw": #1e2d44,
+    "300": #273d58,
+    "300-contrast": adaptive-contrast(#273d58),
+    "300-raw": #273d58,
+    "400": #34506f,
+    "400-contrast": adaptive-contrast(#34506f),
+    "400-raw": #34506f,
+    "500": #47688c,
+    "500-contrast": adaptive-contrast(#47688c),
+    "500-raw": #47688c,
+    "600": #5f80a5,
+    "600-contrast": adaptive-contrast(#5f80a5),
+    "600-raw": #5f80a5,
+    "700": #7a93b5,
+    "700-contrast": adaptive-contrast(#7a93b5),
+    "700-raw": #7a93b5,
+    "800": #a3bcd4,
+    "800-contrast": adaptive-contrast(#a3bcd4),
+    "800-raw": #a3bcd4,
+    "900": #e2e8f0,
+    "900-contrast": adaptive-contrast(#e2e8f0),
+    "900-raw": #e2e8f0,
+  ),
+  "_meta": (
+    "variant": dark,
+  ),
+);
+
+/// Light palette: applied when the desk switches to its light appearance.
+///
+/// Not the dark palette inverted. The desk's colour lives in its figures, so
+/// the light theme takes the opposite bet from the dark one: the chrome goes
+/// almost colourless (a white field, a near-neutral gray ramp, hairline rules)
+/// and every P&L figure sits in a tinted cell instead, which turns each table
+/// into a heat map that can be read by shape before it is read by number.
+///
+/// Three rules keep that from becoming a second, unrelated product:
+///
+/// **The hues do not move.** `success` sits at the dark mint's 158 degrees and
+/// `error` at the coral's 350; only lightness and saturation change. The green
+/// and the red are the same two colours in both themes, deepened for a white
+/// ground rather than swapped for different ones.
+///
+/// **The value asymmetry survives.** Up has to read lighter than down in *both*
+/// themes, so that a candle field separates by value and not by hue alone.
+///
+/// **Two accents, not three.** Blue is confined to text, borders, indicators
+/// and focus rings; every *fill* that used to carry it (row and cell selection,
+/// chip and tab and button-group selection, the rail's active item) is a
+/// neutral gray step (see `$sd-fill-*` below), so nothing competes with the P&L
+/// pair on the data itself. `info` folds into the same blue.
+///
+/// Every value here clears WCAG AA on the surfaces it actually lands on,
+/// including the tinted cells and the neutral selection fill. `warn` is a deep
+/// amber for the same reason.
+$sd-light-palette: (
+  "primary": shades("primary", #5486cf, $IColorShades),
+  "secondary": shades("secondary", #5486cf, $IColorShades),
+  "surface": shades("surface", #fbfbfc, $IColorShades),
+  "info": shades("info", #5486cf, $IColorShades),
+  "success": shades("success", rgb(6, 117, 71), $IColorShades),
+  "warn": shades("warn", #9a5b00, $IColorShades),
+  "error": shades("error", #a60722, $IColorShades),
+
+  // Near-neutral rather than the blue-tinted ramp the dark theme runs: at
+  // 8-15% saturation the greys carry no accent of their own, which is what
+  // lets the figures be the only colour on the field. The three steps the
+  // desk leans on hardest are fixed points (100 the pane and header fill,
+  // 200 every hairline and rule, 700 the label ink over both) and 300-600
+  // interpolate between them.
+  "gray": (
+    "50": #ffffff,
+    "50-contrast": adaptive-contrast(#ffffff),
+    "50-raw": #ffffff,
+    "100": #f8f9fb,
+    "100-contrast": adaptive-contrast(#f8f9fb),
+    "100-raw": #f8f9fb,
+    "200": #e2e5e9,
+    "200-contrast": adaptive-contrast(#e2e5e9),
+    "200-raw": #e2e5e9,
+    "300": #cad0d8,
+    "300-contrast": adaptive-contrast(#cad0d8),
+    "300-raw": #cad0d8,
+    "400": #b2b8c2,
+    "400-contrast": adaptive-contrast(#b2b8c2),
+    "400-raw": #b2b8c2,
+    "500": #99a1ad,
+    "500-contrast": adaptive-contrast(#99a1ad),
+    "500-raw": #99a1ad,
+    "600": #828997,
+    "600-contrast": adaptive-contrast(#828997),
+    "600-raw": #828997,
+    "700": #646a78,
+    "700-contrast": adaptive-contrast(#646a78),
+    "700-raw": #646a78,
+    "800": #434b5b,
+    "800-contrast": adaptive-contrast(#434b5b),
+    "800-raw": #434b5b,
+    "900": #212936,
+    "900-contrast": adaptive-contrast(#212936),
+    "900-raw": #212936,
+  ),
+  "_meta": (
+    "variant": light,
+  ),
+);
+
+/// The neutral fill ladder, and the hairline.
+///
+/// `palette()` gives ten grey steps but the desk needs four values *between*
+/// them: three interactive fills for every selectable thing, and one rule
+/// colour lighter than the 200 step the borders use.
+///
+/// They are `color-mix()` over palette references rather than literals, so both
+/// palettes derive their own ladder from their own greys.
+$sd-hairline: color-mix(in srgb, var(--ig-gray-200) 60%, var(--ig-gray-50));
+$sd-fill-hover: color-mix(in srgb, var(--ig-gray-100) 30%, var(--ig-gray-50));
+$sd-fill-selected: color-mix(in srgb, var(--ig-gray-200) 60%, var(--ig-gray-100));
+$sd-fill-selected-hover: var(--ig-gray-200);
+
+/// The accent, as *text on a neutral fill*: selected chips and tabs, the active
+/// rail item, the selected button-group item, the snackbar's action.
+///
+/// A separate token from `--ig-primary-500` because the two appearances need
+/// different shades and a chromatic ramp does not invert: 500 is the darker end
+/// in both, which is right over a white fill and too dark over a blue-black one.
+/// Where the accent is a line (the focus ring, the row-drag marker, the tab
+/// indicator, the sort icons) it stays `--ig-primary-500`.
+$sd-accent-on-fill: light-dark(var(--ig-primary-500), var(--ig-primary-600));
